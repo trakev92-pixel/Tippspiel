@@ -656,7 +656,41 @@ function renderWMResultsTab() {
         tbody.innerHTML += `<tr><td><span style="background:#e2e8f0; padding:2px 6px; border-radius:4px;">Spiel ${match.id}</span></td><td><small>${match.date} - ${match.time} Uhr</small></td><td><strong>${match.home}</strong> vs. <strong>${match.away}</strong></td><td><span style="padding:4px 10px; border-radius:6px; ${scoreStyle}">${scoreText}</span></td></tr>`;
     });
 }
+// Hilfsfunktion für Supabase-Anfragen (KORREKTE FASSUNG)
+async function supabaseFetch(table, method = "GET", body = null) {
+    const url = `${SUPABASE_URL}/rest/v1/${table}`;
+    
+    const headers = {
+        "apikey": SUPABASE_KEY,
+        "Authorization": `Bearer ${SUPABASE_KEY}`,
+        "Content-Type": "application/json"
+    };
+    
+    // NUR wenn wir Daten senden (POST), wollen wir doppelte Einträge überschreiben
+    if (method === "POST") {
+        headers["Prefer"] = "resolution=merge-duplicates";
+    }
 
+    const options = { 
+        method: method, 
+        headers: headers 
+    };
+    
+    if (body) options.body = JSON.stringify(body);
+    
+    try {
+        const response = await fetch(url, options);
+        if (!response.ok) {
+            const errText = await response.text();
+            throw new Error(`Supabase Fehler: ${response.status} - ${errText}`);
+        }
+        // WICHTIG: Nur bei GET werden Daten zurückgegeben, sonst ist die Antwort leer
+        return method === "GET" ? await response.json() : null;
+    } catch (e) {
+        console.error("Fetch-Fehler:", e);
+        return method === "GET" ? [] : null;
+    }
+}
 async function initApp() {
     generate104Matches();
     buildKachelnAndTabs();

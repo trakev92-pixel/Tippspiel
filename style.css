@@ -1,0 +1,120 @@
+/* --- 🖨️ MAGISCHER PDF- & POSTER-AUSDRUCK MODUS (PLATZSPAREND) --- */
+@media print {
+    /* Alle Knöpfe, Filter und Menüs komplett ausblenden */
+    button, 
+    .download-poster-btn, 
+    .filter-box, 
+    .kachel-leiste, 
+    #login-form-area, 
+    .welcome-box,
+    .action-buttons {
+        display: none !important;
+    }
+
+    /* Hintergrund und Abstände für maximalen Platzgewinn optimieren */
+    body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-family: 'Arial Narrow', Arial, sans-serif; /* Schmalere Schrift spart Platz */
+        padding: 0;
+        margin: 5mm; /* Kleinerer Rand = mehr Platz für Spiele */
+    }
+
+    header {
+        background: transparent !important;
+        color: black !important;
+        padding: 5px !important;
+        margin-bottom: 10px !important;
+    }
+    
+    header h1 {
+        font-size: 1.5rem !important;
+    }
+
+    /* Das ist der Zaubertrick: Zwei Spiele nebeneinander drucken! */
+    #matches-container {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important; /* Spaltet die Seite in 2 Spalten auf */
+        gap: 4px 15px !important; /* Sehr kompakte Abstände */
+    }
+
+    /* Jede Spielkarte extrem flach und kompakt machen */
+    .match-card {
+        border: none !important;
+        border-bottom: 1px dashed #cbd5e0 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        padding: 4px 0 !important; /* Kaum noch Innenabstand */
+        margin: 0 !important;
+        page-break-inside: avoid; /* Verhindert, dass ein Spiel auf zwei Seiten zerschnitten wird */
+    }
+
+    .match-info {
+        font-size: 8pt !important;
+        line-height: 1.1;
+    }
+
+    /* Zeilen für Tipp und Ergebnis super eng zusammenrücken */
+    .poster-row {
+        display: flex !important;
+        align-items: center;
+        margin: 2px 0 !important;
+    }
+
+    /* Label links ("Dein Tipp:") */
+    .poster-label {
+        display: inline-block !important;
+        width: 55px !important;
+        font-weight: bold;
+        font-size: 8pt !important;
+        color: #4a5568;
+    }
+
+    /* Eingabefelder zu winzigen, schicken Schreib-Kästchen machen */
+    input[type="number"].tipp-box {
+        border: 1px solid #3182ce !important;
+        background: #f7fafc !important;
+        width: 24px !important; /* Schmalere Boxen */
+        height: 16px !important; /* Flachere Boxen */
+        border-radius: 3px !important;
+        color: transparent !important;
+        text-align: center;
+        font-size: 8pt !important;
+    }
+
+    /* Rote Kästchen für das echte Ergebnis */
+    .leeres-ergebnis-feld {
+        display: inline-block !important;
+        border: 1px solid #e53e3e !important;
+        background: #fff5f5 !important;
+        width: 24px !important;
+        height: 16px !important;
+        border-radius: 3px !important;
+    }
+
+    .trenner {
+        margin: 0 3px;
+        font-weight: bold;
+        font-size: 8pt;
+    }
+    
+    /* Teamnamen kürzen/platzsparend ausrichten */
+    .team-home {
+        text-align: right;
+        width: 100px !important;
+        margin-right: 5px;
+        font-size: 8.5pt !important;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+    
+    .team-away {
+        text-align: left;
+        width: 100px !important;
+        margin-left: 5px;
+        font-size: 8.5pt !important;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+}

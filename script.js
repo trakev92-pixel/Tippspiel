@@ -27,7 +27,7 @@ function generate104Matches() {
         { phase: "Gruppe D", cat: "Gruppe A-D", date: "13.06.2026", time: "03:00", h: "USA 🇺🇸", a: "Paraguay 🇵🇾" },
         { phase: "Gruppe B", cat: "Gruppe A-D", date: "13.06.2026", time: "21:00", h: "Katar 🇶🇦", a: "Schweiz 🇨🇭" },
         { phase: "Gruppe C", cat: "Gruppe A-D", date: "14.06.2026", time: "00:00", h: "Brasilien 🇧🇷", a: "Marokko 🇲🇦" },
-        { phase: "Gruppe C", cat: "Gruppe A-D", date: "14.06.2026", time: "03:00", h: "Haiti 🇭🇹", a: "Schottland 🏴󠁧󠁢󠁣󠁴󠁿" },
+        { phase: "Gruppe C", cat: "Gruppe A-D", date: "14.06.2026", time: "03:00", h: "Haiti 🇭🇹", a: "Schottland 🏴󠁧󠁢󠁳󠁣󠁴󠁿" },
         { phase: "Gruppe D", cat: "Gruppe A-D", date: "14.06.2026", time: "06:00", h: "Australien 🇦🇺", a: "Türkei 🇹🇷" },
         { phase: "Gruppe E", cat: "Gruppe E-H", date: "14.06.2026", time: "19:00", h: "Deutschland 🇩🇪", a: "Curaçao 🇨🇼" },
         { phase: "Gruppe F", cat: "Gruppe E-H", date: "14.06.2026", time: "22:00", h: "Niederlande 🇳🇱", a: "Japan 🇯🇵" },
@@ -220,6 +220,7 @@ function buildKachelnAndTabs() {
     `;
 }
 
+/* FIX 1: Wenn der Gruppen-Tab geöffnet wird, zeichnen wir die Gruppen jetzt zuverlässig! */
 function switchTab(tabName) {
     document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
     document.querySelectorAll('.kachel').forEach(el => {
@@ -234,6 +235,10 @@ function switchTab(tabName) {
     if(targetBtn) {
         targetBtn.style.background = '#3182ce';
         targetBtn.style.color = 'white';
+    }
+
+    if (tabName === "gruppen") {
+        renderGruppen();
     }
 }
 
@@ -339,7 +344,6 @@ function calculatePoints(tHome, tAway, rHome, rAway) {
     return 0; 
 }
 
-/* ERWEITERTE FUNKTION: Generiert zwei getrennte Zeilen für Tipp und Ergebnis */
 function renderMatches() {
     const container = document.getElementById("matches-container");
     if(!container) return;
@@ -583,6 +587,7 @@ function renderWMResultsTab() {
     });
 }
 
+/* FIX 2: renderLeaderboard() direkt beim Start laden, damit die Rangliste nie unberechnet bleibt! */
 function initApp() {
     generate104Matches();
     buildKachelnAndTabs();
@@ -590,13 +595,12 @@ function initApp() {
     
     renderMatches();
     renderGruppen();
-    renderLeaderboard();
+    renderLeaderboard(); 
     renderWMResultsTab();
     
     switchTab("tippen");
 }
 
-/* Sicherheitsnetz für den vollständigen Start */
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initApp);
 } else {

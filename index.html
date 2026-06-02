@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WM 2026 Tippspiel</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header style="text-align: center; padding: 20px; background: #1a365d; color: white; margin-bottom: 20px; border-radius: 0 0 12px 12px;">
+        <h1 style="margin: 0; font-size: 2rem;">🏆 WM 2026 TIPPSPIEL 🏆</h1>
+        <p style="margin: 5px 0 15px 0; opacity: 0.9;">Tippe die Spiele und hole dir den Thron!</p>
+        
+        <button onclick="window.print()" class="download-poster-btn">
+            🖨️ Poster als PDF herunterladen / drucken
+        </button>
+    </header>
+
+    <main style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+        <div class="kachel-leiste" style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;"></div>
+
+        <div id="tab-content-area"></div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

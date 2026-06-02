@@ -1,6 +1,14 @@
+// Trage hier später deine Live-URL ein, wenn der Server online ist!
+const API_URL = "http://localhost:3000"; 
+
 let currentUser = localStorage.getItem("wm_user_2026") || "";
 let isAdmin = false;
 const matches = [];
+
+// Server-Daten-Caches
+let serverTips = [];
+let serverResults = {};
+let serverBonusTips = {};
 
 const ADMIN_PASSWORD = "wm2026admin"; 
 
@@ -27,7 +35,7 @@ function generate104Matches() {
         { phase: "Gruppe D", cat: "Gruppe A-D", date: "13.06.2026", time: "03:00", h: "USA 🇺🇸", a: "Paraguay 🇵🇾" },
         { phase: "Gruppe B", cat: "Gruppe A-D", date: "13.06.2026", time: "21:00", h: "Katar 🇶🇦", a: "Schweiz 🇨🇭" },
         { phase: "Gruppe C", cat: "Gruppe A-D", date: "14.06.2026", time: "00:00", h: "Brasilien 🇧🇷", a: "Marokko 🇲🇦" },
-        { phase: "Gruppe C", cat: "Gruppe A-D", date: "14.06.2026", time: "03:00", h: "Haiti 🇭🇹", a: "Schottland 🏴󠁧󠁢󠁳󠁣󠁴󠁿" },
+        { phase: "Gruppe C", cat: "Gruppe A-D", date: "14.06.2026", time: "03:00", h: "Haiti 🇭🇹", a: "Schottland 🏴󠁧󠁢󠁣󠁴󠁿" },
         { phase: "Gruppe D", cat: "Gruppe A-D", date: "14.06.2026", time: "06:00", h: "Australien 🇦🇺", a: "Türkei 🇹🇷" },
         { phase: "Gruppe E", cat: "Gruppe E-H", date: "14.06.2026", time: "19:00", h: "Deutschland 🇩🇪", a: "Curaçao 🇨🇼" },
         { phase: "Gruppe F", cat: "Gruppe E-H", date: "14.06.2026", time: "22:00", h: "Niederlande 🇳🇱", a: "Japan 🇯🇵" },
@@ -66,7 +74,7 @@ function generate104Matches() {
         { phase: "Gruppe I", cat: "Gruppe I-L", date: "23.06.2026", time: "02:00", h: "Norwegen 🇳🇴", a: "Senegal 🇸🇳" },
         { phase: "Gruppe J", cat: "Gruppe I-L", date: "23.06.2026", time: "05:00", h: "Jordanien 🇯🇴", a: "Algerien 🇩🇿" },
         { phase: "Gruppe K", cat: "Gruppe I-L", date: "23.06.2026", time: "19:00", h: "Portugal 🇵🇹", a: "Usbekistan 🇺🇿" },
-        { phase: "Gruppe L", cat: "Gruppe I-L", date: "23.06.2026", time: "22:00", h: "England 🏴󠁧󠁢󠁥󠁮󠁧󠁿", a: "Kroatien 🇭🇷" },
+        { phase: "Gruppe L", cat: "Gruppe I-L", date: "22.06.2026", time: "22:00", h: "England 🏴󠁧󠁢󠁥󠁮󠁧󠁿", a: "Kroatien 🇭🇷" },
         { phase: "Gruppe L", cat: "Gruppe I-L", date: "24.06.2026", time: "01:00", h: "Ghana 🇬🇭", a: "Panama 🇵🇦" },
         { phase: "Gruppe K", cat: "Gruppe I-L", date: "24.06.2026", time: "04:00", h: "Kolumbien 🇨🇴", a: "DR Kongo 🇨🇩" },
         { phase: "Gruppe B", cat: "Gruppe A-D", date: "24.06.2026", time: "21:00", h: "Schweiz 🇨🇭", a: "Kanada 🇨🇦" },
@@ -146,6 +154,19 @@ function generate104Matches() {
     });
 }
 
+// 🌐 NEU: Holt die zentralen Spieldaten live vom Node-Server
+async function fetchServerData() {
+    try {
+        const response = await fetch(`${API_URL}/api/data`);
+        const data = await response.json();
+        serverTips = data.tips;
+        serverResults = data.results;
+        serverBonusTips = data.bonus;
+    } catch (error) {
+        console.error("Fehler beim Abrufen der Serverdaten:", error);
+    }
+}
+
 function buildKachelnAndTabs() {
     let kachelLeiste = document.querySelector(".kachel-leiste");
     if (!kachelLeiste) return;
@@ -220,8 +241,7 @@ function buildKachelnAndTabs() {
     `;
 }
 
-/* FIX 1: Wenn der Gruppen-Tab geöffnet wird, zeichnen wir die Gruppen jetzt zuverlässig! */
-function switchTab(tabName) {
+async function switchTab(tabName) {
     document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
     document.querySelectorAll('.kachel').forEach(el => {
         el.style.background = '#e2e8f0';
@@ -237,12 +257,21 @@ function switchTab(tabName) {
         targetBtn.style.color = 'white';
     }
 
+    // Vor dem Zeichnen der Tabs immer die neuesten globalen Daten laden!
+    await fetchServerData();
+
     if (tabName === "gruppen") {
         renderGruppen();
+    } else if (tabName === "tippspielrangliste") {
+        renderLeaderboard();
+    } else if (tabName === "wm-ergebnisse") {
+        renderWMResultsTab();
+    } else if (tabName === "tippen") {
+        renderMatches();
     }
 }
 
-function registerUser() {
+async function registerUser() {
     const nameInput = document.getElementById("username").value.trim();
     if(nameInput === "") { alert("Bitte Namen eingeben!"); return; }
 
@@ -266,15 +295,20 @@ function registerUser() {
     currentUser = nameInput;
     localStorage.setItem("wm_user_2026", currentUser);
     
-    let allBonusTips = JSON.parse(localStorage.getItem("wm_bonus_tips_2026")) || {};
-    allBonusTips[currentUser] = { wm: wmTip, scorer: scorerTip };
-    localStorage.setItem("wm_bonus_tips_2026", JSON.stringify(allBonusTips));
+    // 🌐 NEU: Bonustipp an den zentralen Server senden
+    try {
+        await fetch(`${API_URL}/api/bonus`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user: currentUser, wm: wmTip, scorer: scorerTip })
+        });
+    } catch(e) { console.error("Fehler beim Bonus-Senden:", e); }
 
     alert(`Angemeldet als '${currentUser}'!`);
     
+    await fetchServerData();
     updateWelcomeMessage();
     renderMatches();
-    renderLeaderboard();
 }
 
 function updateWelcomeMessage() {
@@ -287,8 +321,7 @@ function updateWelcomeMessage() {
         welcome.innerHTML = `<span style="color:#c53030;">⚙️ Modus: <strong>Admin-Zentrale</strong></span>`;
         formArea.innerHTML = `<button onclick="logoutAdmin()" style="background:#e53e3e; color:white;">Admin beenden</button>`;
     } else if(currentUser) {
-        const allBonusTips = JSON.parse(localStorage.getItem("wm_bonus_tips_2026")) || {};
-        const userBonus = allBonusTips[currentUser] || { wm: "Kein Tipp", scorer: "Kein Tipp" };
+        const userBonus = serverBonusTips[currentUser] || { wm: "Kein Tipp", scorer: "Kein Tipp" };
 
         welcome.innerHTML = `
             👋 Angemeldet als: <strong style="color:#3182ce; font-size:1.2rem;">${currentUser}</strong><br>
@@ -320,9 +353,6 @@ function logoutAdmin() {
     
     buildKachelnAndTabs();
     updateWelcomeMessage();
-    renderMatches();
-    renderLeaderboard();
-    renderWMResultsTab();
     switchTab("tippen");
 }
 
@@ -333,7 +363,6 @@ function calculatePoints(tHome, tAway, rHome, rAway) {
     const ra = parseInt(rAway);
 
     if (isNaN(th) || isNaN(ta) || isNaN(rh) || isNaN(ra)) return 0;
-
     if (th === rh && ta === ra) return 4;
     if (th === ra && ta === rh) return 1;
 
@@ -353,11 +382,8 @@ function renderMatches() {
     const filteredMatches = matches.filter(m => filterValue === "ALL" || m.filterCategory === filterValue);
 
     filteredMatches.forEach(match => {
-        const allTips = JSON.parse(localStorage.getItem("wm_tips_2026")) || [];
-        const realResults = JSON.parse(localStorage.getItem("wm_results_2026")) || {};
-        
-        const existingTip = allTips.find(t => t.user === currentUser && t.matchId === match.id);
-        const matchResult = realResults[match.id];
+        const existingTip = serverTips.find(t => t.user === currentUser && t.matchId === match.id);
+        const matchResult = serverResults[match.id];
 
         let valHome = existingTip ? existingTip.homeGoals : "";
         let valAway = existingTip ? existingTip.awayGoals : "";
@@ -399,22 +425,14 @@ function renderMatches() {
                     <span class="team-away">${match.away}</span>
                 </div>
 
-                <div class="poster-row ergebnis-zeile">
-                    <span class="poster-label">Ergebnis:</span>
-                    <span class="team-home">${match.home}</span>
-                    <div class="leeres-ergebnis-feld"></div>
-                    <span class="trenner">:</span>
-                    <div class="leeres-ergebnis-feld"></div>
-                    <span class="team-away">${match.away}</span>
-                </div>
-
                 <div class="action-buttons" style="margin-top:10px;">${buttonHTML}</div>
             </div>
         `;
     });
 }
 
-function saveTip(matchId, matchTeams, phase) {
+// 🌐 NEU: Tipps direkt per POST-Request an den Server funken
+async function saveTip(matchId, matchTeams, phase) {
     if(!currentUser || isAdmin) { alert("Bitte melde dich zuerst als Tipper an!"); return; }
     const homeGoals = document.getElementById(`home-${matchId}`).value;
     const awayGoals = document.getElementById(`away-${matchId}`).value;
@@ -426,28 +444,43 @@ function saveTip(matchId, matchTeams, phase) {
         score: homeGoals + " : " + awayGoals, homeGoals: homeGoals, awayGoals: awayGoals
     };
 
-    let allTips = JSON.parse(localStorage.getItem("wm_tips_2026")) || [];
-    allTips = allTips.filter(t => !(t.user === currentUser && t.matchId === matchId));
-    allTips.push(newTip);
-    localStorage.setItem("wm_tips_2026", JSON.stringify(allTips));
-    
-    alert("Tipp erfolgreich gespeichert!");
-    renderLeaderboard();
+    try {
+        const response = await fetch(`${API_URL}/api/tips`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newTip)
+        });
+        if(response.ok) {
+            alert("Tipp erfolgreich auf dem Server gespeichert!");
+            await fetchServerData();
+            renderMatches();
+        }
+    } catch (e) {
+        alert("Fehler beim Senden an den Server!");
+        console.error(e);
+    }
 }
 
-function saveRealResult(matchId) {
+// 🌐 NEU: Offizielles Ergebnis an den Server funken
+async function saveRealResult(matchId) {
     const homeGoals = document.getElementById(`home-${matchId}`).value;
     const awayGoals = document.getElementById(`away-${matchId}`).value;
 
     if(homeGoals === "" || awayGoals === "") { alert("Bitte Tore eintragen!"); return; }
 
-    let realResults = JSON.parse(localStorage.getItem("wm_results_2026")) || {};
-    realResults[matchId] = { home: homeGoals, away: awayGoals };
-    localStorage.setItem("wm_results_2026", JSON.stringify(realResults));
-    
-    renderMatches();
-    renderLeaderboard();
-    renderWMResultsTab();
+    try {
+        const response = await fetch(`${API_URL}/api/results`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ matchId, home: homeGoals, away: awayGoals })
+        });
+        if(response.ok) {
+            await fetchServerData();
+            renderMatches();
+        }
+    } catch(e) {
+        console.error("Fehler beim Ergebnis-Senden:", e);
+    }
 }
 
 function renderGruppen() {
@@ -474,16 +507,13 @@ function renderLeaderboard() {
     const mainTab = document.getElementById("tab-tippspielrangliste");
     if(!mainTab) return;
 
-    const allTips = JSON.parse(localStorage.getItem("wm_tips_2026")) || [];
-    const realResults = JSON.parse(localStorage.getItem("wm_results_2026")) || {};
-    const allBonusTips = JSON.parse(localStorage.getItem("wm_bonus_tips_2026")) || {};
-
     const userPoints = {};
     if (currentUser && currentUser !== "Admin⚙️" && !userPoints[currentUser]) userPoints[currentUser] = 0;
-    allTips.forEach(t => { if(!userPoints[t.user]) userPoints[t.user] = 0; });
+    
+    serverTips.forEach(t => { if(!userPoints[t.user]) userPoints[t.user] = 0; });
 
-    allTips.forEach(tip => {
-        const result = realResults[tip.matchId];
+    serverTips.forEach(tip => {
+        const result = serverResults[tip.matchId];
         if (result) {
             const p = calculatePoints(tip.homeGoals, tip.awayGoals, result.home, result.away);
             userPoints[tip.user] += p;
@@ -534,9 +564,9 @@ function renderLeaderboard() {
     `;
 
     let bonusRowsExist = false;
-    for(let user in allBonusTips) {
+    for(let user in serverBonusTips) {
         bonusRowsExist = true;
-        bonusHTML += `<tr><td><strong>${user}</strong></td><td style="color:#2b6cb0;">🏆 ${allBonusTips[user].wm}</td><td style="color:#4a5568;">👟 ${allBonusTips[user].scorer}</td></tr>`;
+        bonusHTML += `<tr><td><strong>${user}</strong></td><td style="color:#2b6cb0;">🏆 ${serverBonusTips[user].wm}</td><td style="color:#4a5568;">👟 ${serverBonusTips[user].scorer}</td></tr>`;
     }
     if(!bonusRowsExist) {
         bonusHTML += `<tr><td colspan="3" style="text-align:center; color:#a0aec0; padding:10px;">Noch keine Bonustipps abgegeben.</td></tr>`;
@@ -544,9 +574,9 @@ function renderLeaderboard() {
     bonusHTML += `</tbody></table></div>`;
 
     let protocolRows = "";
-    allTips.sort((a, b) => a.matchId - b.matchId);
-    allTips.forEach(tip => {
-        const result = realResults[tip.matchId];
+    const sortedTips = [...serverTips].sort((a, b) => a.matchId - b.matchId);
+    sortedTips.forEach(tip => {
+        const result = serverResults[tip.matchId];
         let pBadge = `<span style="background:#cbd5e0; padding:4px 8px; border-radius:4px; font-size:0.8rem;">Wartet...</span>`;
         if(result) {
             const p = calculatePoints(tip.homeGoals, tip.awayGoals, result.home, result.away);
@@ -575,11 +605,9 @@ function renderWMResultsTab() {
     const tbody = document.getElementById("wm-results-body");
     if(!tbody) return;
     tbody.innerHTML = "";
-    
-    const realResults = JSON.parse(localStorage.getItem("wm_results_2026")) || {};
 
     matches.forEach(match => {
-        const res = realResults[match.id];
+        const res = serverResults[match.id];
         const scoreText = res ? `${res.home} : ${res.away}` : "---";
         const scoreStyle = res ? "background:#fed7d7; color:#c53030; font-weight:bold;" : "color:#a0aec0;";
 
@@ -587,12 +615,14 @@ function renderWMResultsTab() {
     });
 }
 
-/* FIX 2: renderLeaderboard() direkt beim Start laden, damit die Rangliste nie unberechnet bleibt! */
-function initApp() {
+async function initApp() {
     generate104Matches();
     buildKachelnAndTabs();
-    updateWelcomeMessage();
     
+    // Zuerst Server-Daten ziehen, dann alles zeichnen!
+    await fetchServerData();
+    
+    updateWelcomeMessage();
     renderMatches();
     renderGruppen();
     renderLeaderboard(); 

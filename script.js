@@ -178,11 +178,41 @@ function generate104Matches() {
 }
 
 // 🌐 Lädt alle Daten direkt von den 3 Supabase-Tabellen
-async function fetchServerData() {
-    const tipsData = await supabaseFetch("wm_tips");
-    const resultsData = await supabaseFetch("wm_results");
-    const bonusData = await supabaseFetch("wm_bonus_tips");
+// Hilfsfunktion für Supabase-Anfragen (KORRIGIERT FÜR UPSERT)
+async function supabaseFetch(table, method = "POST", body = null) {
+    const url = `${SUPABASE_URL}/rest/v1/${table}`;
+    
+    // Wenn wir Daten senden (POST), nutzen wir "Upsert", um bestehende Tipps zu aktualisieren
+    const headers = {
+        "apikey": SUPABASE_KEY,
+        "Authorization": `Bearer ${SUPABASE_KEY}`,
+        "Content-Type": "application/json"
+    };
+    
+    if (method === "POST") {
+        headers["Prefer"] = "resolution=merge-duplicates";
+    }
 
+    const options = { 
+        method: method, 
+        headers: headers 
+    };
+    
+    if (body) options.body = JSON.stringify(body);
+    
+    try {
+        const response = await fetch(url, options);
+        if (!response.ok) {
+            const errText = await response.text();
+            throw new Error(`Supabase Fehler: ${response.status} - ${errText}`);
+        }
+        // Nur bei GET-Anfragen (Daten laden) erwarten wir JSON zurück
+        return method === "GET" ? await response.json() : null;
+    } catch (e) {
+        console.error("Fetch-Fehler:", e);
+        return method === "GET" ? [] : null;
+    }
+}
     // 1. Tipps mappen
     serverTips = tipsData.map(t => ({
         user: t.user_name, matchId: t.match_id, matchTeams: t.match_teams,

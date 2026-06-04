@@ -48,39 +48,85 @@ async function getFromSupabase(table) {
 // 🌐 DATEN IN SUPABASE SPEICHERN / ÜBERSCHREIBEN (POST)
 // 🌐 DATEN IN SUPABASE SPEICHERN / ÜBERSCHREIBEN (POST mit Upsert-Logik)
 // 🌐 DATEN IN SUPABASE SPEICHERN / ÜBERSCHREIBEN (POST mit sauberer Upsert-Logik)
-async function saveToSupabase(table, body) {
+// 🌐 DATEN IN SUPABASE SPEICHERN ODER AKTUALISIEREN
+async function saveToSupabase(table, body, method = "POST", rowId = null) {
     let url = `${SUPABASE_URL}/rest/v1/${table}`;
     
+    // Wenn wir updaten (PATCH), hängen wir die ID der Zeile an die URL
+    if (method === "PATCH" && rowId) {
+        url += `?id=eq.${rowId}`;
+    }
+
     const headers = {
         "apikey": SUPABASE_KEY,
         "Authorization": `Bearer ${SUPABASE_KEY}`,
-        "Content-Type": "application/json",
-        "Prefer": "resolution=merge-duplicates" 
+        "Content-Type": "application/json"
     };
 
-    // Für die Spiel-Tipps: Wenn der Tipp existiert (user_name + match_id gleich), überschreiben!
-    if (table === "wm_tips") {
-        headers["Prefer"] = "return=representation,resolution=merge-duplicates";
-        url += "?on_conflict=user_name,match_id";
-    }
-    
-    // Für die Bonus-Tipps: Wenn der User existiert (user_name gleich), überschreiben!
-    if (table === "wm_bonus_tips") {
-        headers["Prefer"] = "return=representation,resolution=merge-duplicates";
-        url += "?on_conflict=user_name";
-    }
-
     try {
-        const response = await fetch(url, { method: "POST", headers: headers, body: JSON.stringify(body) });
+        const response = await fetch(url, { method: method, headers: headers, body: JSON.stringify(body) });
         if (!response.ok) {
             const txt = await response.text();
-            throw new Error(`Fehler bei POST: ${txt}`);
+            throw new Error(`Fehler bei ${method}: ${txt}`);
         }
         return true;
     } catch (e) {
         console.error(e);
         alert("Fehler beim Speichern in der Cloud: " + e.message);
         return false;
+    }
+}
+
+// ⚽ DIESE FUNKTION PRÜFT ERST, OB DER TIPP EXISTIERT UND ENTSCHEIDET (POST ODER PATCH)
+async function saveTip(matchId, matchTeams, phase) {
+    if(!currentUser || isAdmin) { alert("Bitte melde dich zuerst als Tipper an!"); return; }
+    const homeGoals = document.getElementById(`home-${matchId}`).value;
+    const awayGoals = document.getElementById(`away-${matchId}`).value;
+
+    if(homeGoals === "" || awayGoals === "") { alert("Bitte Tore eintragen!"); return; }
+
+    // 1. Wir fragen Supabase direkt, ob dieser User für dieses Spiel schon in der DB steht
+    const checkUrl = `${SUPABASE_URL}/rest/v1/wm_tips?user_name=eq.${encodeURIComponent(currentUser)}&match_id=eq.${matchId}`;
+    let existingId = null;
+
+    try {
+        const checkRes = await fetch(checkUrl, {
+            method: "GET",
+            headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
+        });
+        const checkData = await checkRes.json();
+        if (checkData && checkData.length > 0) {
+            // Gefunden! Wir merken uns die ID des alten Tipps
+            existingId = checkData[0].id;
+        }
+    } catch(err) {
+        console.error("Fehler beim Prüfen auf doppelte Einträge:", err);
+    }
+
+    // 2. Wir bauen das Daten-Paket
+    const tipData = {
+        user_name: currentUser, 
+        match_id: matchId, 
+        match_teams: matchTeams, 
+        phase: phase,
+        score: homeGoals + " : " + awayGoals, 
+        home_goals: parseInt(homeGoals), 
+        away_goals: parseInt(awayGoals)
+    };
+
+    let success = false;
+
+    // 3. Wenn er existiert -> PATCH (Update), ansonsten -> POST (Neu anlegen)
+    if (existingId) {
+        success = await saveToSupabase("wm_tips", tipData, "PATCH", existingId);
+    } else {
+        success = await saveToSupabase("wm_tips", tipData, "POST");
+    }
+
+    if (success) {
+        alert("Tipp erfolgreich gespeichert!");
+        await fetchServerData();
+        renderMatches();
     }
 }
 function generate104Matches() {

@@ -1,6 +1,6 @@
 // ⚠️ HIER DEINE DATEN VON SUPABASE EINTRAGEN!
 const SUPABASE_URL = "https://abzivpkrhespyvubtcer.supabase.co"; 
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFieml2cGtyaGVzcHl2dWJ0Y2VyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0MjQ0MzIsImV4cCI6MjA5NjAwMDQzMn0.V2_K_GOQIgvhTmHRDl5y0EyF0AbeopYJ-u8ermrgOl8";
+const SUPABASE_KEY = "HIER_DEINEN_ANON_PUBLIC_KEY_EINFUEGEN";
 
 let currentUser = localStorage.getItem("wm_user_2026") || "";
 let currentPin = localStorage.getItem("wm_pin_2026") || ""; // Merkt sich die PIN
@@ -58,9 +58,10 @@ async function getFromSupabase(table) {
 // 🌐 DATEN IN SUPABASE SPEICHERN ODER AKTUALISIEREN (POST / PATCH)
 async function saveToSupabase(table, body, method = "POST", rowId = null) {
     let url = `${SUPABASE_URL}/rest/v1/${table}`;
-    
-    if (method === "PATCH" && rowId) {
-        url += `?id=eq.${rowId}`;
+     
+    if (method === "PATCH") {
+        // Da user_name dein Primärschlüssel in wm_bonus_tips ist, filtern wir im Query-String danach
+        url += `?user_name=eq.${encodeURIComponent(body.user_name)}`;
     }
 
     const headers = {
@@ -342,7 +343,7 @@ async function switchTab(tabName) {
     }
 }
 
-// 👤 ANMELDUNG & REGISTRIERUNG
+// 👤 ANMELDUNG & REGISTRIERUNG (KORRIGIERTE STELLE)
 async function registerUser() {
     const nameInput = document.getElementById("username").value.trim();
     const pinInput = document.getElementById("userpin").value.trim();
@@ -366,9 +367,9 @@ async function registerUser() {
 
     if(pinInput.length < 4) { alert("Bitte eine 4-stellige PIN ausdenken/eingeben!"); return; }
 
-    // 🔒 ÜBERARBEITETE PIN-REGELUNG: Wir filtern nach Name UND PIN gleichzeitig!
-    const checkUrl = `${SUPABASE_URL}/rest/v1/wm_bonus_tips?user_name=eq.${encodeURIComponent(nameInput)}&pin=eq.${encodeURIComponent(pinInput)}`;
-    let existingRowId = null;
+    // Wir prüfen erst, ob der Name überhaupt in der Tabelle existiert
+    const checkUrl = `${SUPABASE_URL}/rest/v1/wm_bonus_tips?user_name=eq.${encodeURIComponent(nameInput)}`;
+    let isExistingUser = false;
 
     try {
         const checkRes = await fetch(checkUrl, {
@@ -378,21 +379,12 @@ async function registerUser() {
         const checkData = await checkRes.json();
         
         if (checkData && checkData.length > 0) {
-            // Wenn diese Kombi existiert, updaten wir einfach die Bonustipps dieser Zeile
-            existingRowId = checkData[0].id;
-        } else {
-            // Falls Name existiert, aber mit einer ANDEREN Pin, prüfen wir das, um ein irrtümliches Überschreiben zu blockieren
-            const globalCheckUrl = `${SUPABASE_URL}/rest/v1/wm_bonus_tips?user_name=eq.${encodeURIComponent(nameInput)}`;
-            const globalCheckRes = await fetch(globalCheckUrl, {
-                method: "GET",
-                headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
-            });
-            const globalCheckData = await globalCheckRes.json();
-            
-            if (globalCheckData && globalCheckData.length > 0) {
-                // Ein anderer Kevin hat dieses Konto registriert!
-                // Weil wir Supabase umgestellt haben, können wir diesen Kevin mit neuer PIN einfach neu anlegen!
-                alert(`Hinweis: Ein anderer Tipper heißt bereits '${nameInput}'. Da du eine andere PIN nutzt, wirst du als eigenständiger '${nameInput}' eingetragen!`);
+            // Wenn der Name existiert, MUSS die PIN übereinstimmen um sich anzumelden
+            if (checkData[0].pin === pinInput) {
+                isExistingUser = true;
+            } else {
+                alert("Fehler: Dieser Benutzername existiert bereits, aber die PIN ist falsch!");
+                return; // PIN ungültig -> Abbruch!
             }
         }
     } catch(err) {
@@ -412,8 +404,9 @@ async function registerUser() {
     };
 
     let success = false;
-    if (existingRowId) {
-        success = await saveToSupabase("wm_bonus_tips", saveData, "PATCH", existingRowId);
+    // Wenn der User existiert, updaten wir die Zeile (PATCH), ansonsten legen wir sie neu an (POST)
+    if (isExistingUser) {
+        success = await saveToSupabase("wm_bonus_tips", saveData, "PATCH");
     } else {
         success = await saveToSupabase("wm_bonus_tips", saveData, "POST");
     }
@@ -541,180 +534,4 @@ async function saveTip(matchId, matchTeams, phase) {
         await fetchServerData();
         renderMatches();
     }
-}
-
-// ⚙️ ADMIN SETZT DAS ECHTE SPIELERGEBNIS
-async function saveRealResult(matchId) {
-    if (!isAdmin) return;
-
-    const homeRes = document.getElementById(`home-tip-${matchId}`).value;
-    const awayRes = document.getElementById(`away-tip-${matchId}`).value;
-
-    if (homeRes === "" || awayRes === "") {
-        alert("Bitte beide Felder ausfüllen!");
-        return;
-    }
-
-    const existingResult = serverResults[matchId];
-    const saveData = {
-        match_id: matchId,
-        home_goals: parseInt(homeRes),
-        away_goals: parseInt(awayRes)
-    };
-
-    let success = false;
-    if (existingResult && existingResult.id) {
-        success = await saveToSupabase("wm_results", saveData, "PATCH", existingResult.id);
-    } else {
-        success = await saveToSupabase("wm_results", saveData, "POST");
-    }
-
-    if (success) {
-        alert("Offizielles Ergebnis eingetragen!");
-        await fetchServerData();
-        renderMatches();
-    }
-}
-
-// 🎨 ZEIGT SPIELE AN (MIT FILTERN)
-function renderMatches() {
-    const container = document.getElementById("matches-container");
-    if(!container) return;
-    const filterSelect = document.getElementById("stage-filter");
-    const filterValue = filterSelect ? filterSelect.value : "ALL";
-    container.innerHTML = "";
-
-    const filteredMatches = matches.filter(m => filterValue === "ALL" || m.filterCategory === filterValue);
-
-    filteredMatches.forEach(match => {
-        // 🔒 ÜBERARBEITET: Lädt den korrekten Tipp für genau DIESEN Kevin mit DIESER PIN aus dem Speicher
-        const myExistingTip = serverTips.find(t => t.user === currentUser && t.pin === currentPin && t.matchId === match.id);
-        const matchResult = serverResults[match.id];
-
-        let valHome = myExistingTip ? myExistingTip.homeGoals : "";
-        let valAway = myExistingTip ? myExistingTip.awayGoals : "";
-        
-        let ptsLabel = "";
-        if(matchResult && myExistingTip) {
-            const p = calculatePoints(myExistingTip.homeGoals, myExistingTip.awayGoals, matchResult.home, matchResult.away);
-            ptsLabel = `<span style="margin-left:10px; background:#48bb78; color:white; padding:3px 8px; border-radius:12px; font-size:0.8rem; font-weight:bold;">+${p} Pkt.</span>`;
-        }
-
-        if(isAdmin) {
-            valHome = matchResult ? matchResult.home : "";
-            valAway = matchResult ? matchResult.away : "";
-        }
-
-        const resLabel = matchResult ? `<span style="color:#e53e3e; font-weight:bold; margin-left:10px;">Endstand: ${matchResult.home}:${matchResult.away}</span>` : `<span style="color:#a0aec0; margin-left:10px; font-size:0.85rem;">Noch kein Ergebnis</span>`;
-
-        container.innerHTML += `
-            <div class="match-card" style="padding:15px; background:white; margin-bottom:10px; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.05); border-left: 5px solid ${isAdmin ? '#e53e3e' : '#3182ce'};">
-                <div style="font-size:0.8rem; color:#718096; margin-bottom:5px;">📅 ${match.date} um ${match.time} Uhr — <strong>${match.phase}</strong></div>
-                <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
-                    <div style="font-size:1.05rem; font-weight:500; min-width:200px;">${match.home} vs. ${match.away} ${resLabel} ${ptsLabel}</div>
-                    <div style="display:flex; align-items:center; gap:5px;">
-                        <input type="number" id="home-tip-${match.id}" value="${valHome}" placeholder="0" style="width:45px; padding:6px; text-align:center; border:1px solid #cbd5e0; border-radius:4px;">
-                        <span>:</span>
-                        <input type="number" id="away-tip-${match.id}" value="${valAway}" placeholder="0" style="width:45px; padding:6px; text-align:center; border:1px solid #cbd5e0; border-radius:4px;">
-                        <button onclick="${isAdmin ? `saveRealResult(${match.id})` : `saveTip(${match.id}, '${match.home} - ${match.away}', '${match.phase}')`}" style="background:${isAdmin ? '#e53e3e' : '#3182ce'}; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-weight:bold; margin-left:5px;">
-                            ${isAdmin ? 'Ergebnis setzen' : 'Tippen'}
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `;
-    });
-}
-
-// 📅 ANZEIGE DER WM-GRUPPEN
-function renderGruppen() {
-    const container = document.getElementById("gruppen-container");
-    if (!container) return;
-    container.innerHTML = "";
-
-    for (const [gruppe, teams] of Object.entries(gruppenDaten)) {
-        let teamsHTML = teams.map(team => `<li style="padding:6px 0; border-bottom:1px solid #edf2f7; color:#2d3748;">${team}</li>`).join("");
-        container.innerHTML += `
-            <div style="background:white; padding:15px; border-radius:10px; box-shadow:0 4px 6px rgba(0,0,0,0.02); border:1px solid #e2e8f0;">
-                <h4 style="margin-top:0; color:#3182ce; border-bottom:2px solid #3182ce; padding-bottom:5px;">${gruppe}</h4>
-                <ul style="list-style:none; padding:0; margin:0;">${teamsHTML}</ul>
-            </div>
-        `;
-    }
-}
-
-// 🏆 RANGLISTE (LEADERBOARD) BERECHNEN
-function renderLeaderboard() {
-    const container = document.getElementById("tab-tippspielrangliste");
-    if (!container) return;
-
-    // Map, um Punkte pro User+PIN zu sammeln
-    const userScores = {};
-
-    serverTips.forEach(tip => {
-        const matchResult = serverResults[tip.matchId];
-        let points = 0;
-        if (matchResult) {
-            points = calculatePoints(tip.homeGoals, tip.awayGoals, matchResult.home, matchResult.away);
-        }
-        
-        // Eindeutiger Key aus Name und PIN für die Rangliste
-        const key = `${tip.user}_${tip.pin}`;
-        if (!userScores[key]) {
-            userScores[key] = { name: tip.user, score: 0, tipsCount: 0 };
-        }
-        userScores[key].score += points;
-        userScores[key].tipsCount++;
-    });
-
-    // Sortieren nach Punkten (absteigend)
-    const sorted = Object.values(userScores).sort((a, b) => b.score - a.score);
-
-    let tableRows = sorted.map((u, index) => `
-        <tr style="background:${u.name === currentUser ? '#ebf8ff' : 'transparent'}; font-weight:${u.name === currentUser ? 'bold' : 'normal'};">
-            <td style="padding:10px; border-bottom:1px solid #e2e8f0;">${index + 1}.</td>
-            <td style="padding:10px; border-bottom:1px solid #e2e8f0;">${u.name} ${u.name === currentUser ? '<small style="color:#718096;">(Du)</small>' : ''}</td>
-            <td style="padding:10px; border-bottom:1px solid #e2e8f0; text-align:center;">${u.tipsCount}</td>
-            <td style="padding:10px; border-bottom:1px solid #e2e8f0; text-align:center; font-weight:bold; color:#2b6cb0;">${u.score} Pkt.</td>
-        </tr>
-    `).join("");
-
-    container.innerHTML = `
-        <h3 style="margin-top:0;">🏆 Tippspiel-Rangliste</h3>
-        <p style="color:#718096; font-size:0.9rem;">Punkte: Exakt = 4 | Tendenz = 2 | 1 richtiges Tor bei falscher Tendenz = 1</p>
-        <table style="width:100%; border-collapse:collapse; margin-top:15px;">
-            <thead>
-                <tr style="background:#f7fafc; text-align:left;">
-                    <th style="padding:10px; border-bottom:2px solid #e2e8f0;">Platz</th>
-                    <th style="padding:10px; border-bottom:2px solid #e2e8f0;">Spieler</th>
-                    <th style="padding:10px; border-bottom:2px solid #e2e8f0; text-align:center;">Abgegebene Tipps</th>
-                    <th style="padding:10px; border-bottom:2px solid #e2e8f0; text-align:center;">Gesamtpunkte</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${tableRows.length > 0 ? tableRows : '<tr><td colspan="4" style="padding:15px; text-align:center; color:#a0aec0;">Noch keine Tipps abgegeben.</td></tr>'}
-            </tbody>
-        </table>
-    `;
-}
-
-// 📊 TABELLE FÜR OFFIZIELLE WM-ERGEBNISSE
-function renderWMResultsTab() {
-    const tbody = document.getElementById("wm-results-body");
-    if (!tbody) return;
-    tbody.innerHTML = "";
-
-    matches.forEach(match => {
-        const res = serverResults[match.id];
-        const scoreDisplay = res ? `<strong style="color:#e53e3e;">${res.home} : ${res.away}</strong>` : `<span style="color:#a0aec0;">—</span>`;
-        
-        tbody.innerHTML += `
-            <tr>
-                <td style="padding:8px; border-bottom:1px solid #e2e8f0;">Spiel ${match.id}</td>
-                <td style="padding:8px; border-bottom:1px solid #e2e8f0; font-size:0.85rem; color:#4a5568;">${match.date} ${match.time}</td>
-                <td style="padding:8px; border-bottom:1px solid #e2e8f0;"><strong>${match.home}</strong> vs. <strong>${match.away}</strong></td>
-                <td style="padding:8px; border-bottom:1px solid #e2e8f0; text-align:center;">${scoreDisplay}</td>
-            </tr>
-        `;
-    });
 }

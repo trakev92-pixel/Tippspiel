@@ -1,5 +1,5 @@
 // ⚠️ HIER DEINE DATEN VON SUPABASE EINTRAGEN!
-const SUPABASE_URL = "https://abzivpkrhespyvubtcer.supabase.co/";
+const SUPABASE_URL = "https://abzivpkrhespyvubtcer.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFieml2cGtyaGVzcHl2dWJ0Y2VyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0MjQ0MzIsImV4cCI6MjA5NjAwMDQzMn0.V2_K_GOQIgvhTmHRDl5y0EyF0AbeopYJ-u8ermrgOl8";
 
 let currentUser = localStorage.getItem("wm_user_2026") || "";
@@ -52,7 +52,7 @@ async function saveToSupabase(table, body) {
         "apikey": SUPABASE_KEY,
         "Authorization": `Bearer ${SUPABASE_KEY}`,
         "Content-Type": "application/json",
-        "Prefer": "resolution=merge-duplicates" // Verhindert Fehler bei doppelten Tipps
+        "Prefer": "resolution=merge-duplicates" // Verhindert Fehler bei doppelten Einträgen
     };
     try {
         const response = await fetch(url, { method: "POST", headers: headers, body: JSON.stringify(body) });
@@ -76,7 +76,7 @@ function generate104Matches() {
         { phase: "Gruppe D", cat: "Gruppe A-D", date: "13.06.2026", time: "03:00", h: "USA 🇺🇸", a: "Paraguay 🇵🇾" },
         { phase: "Gruppe B", cat: "Gruppe A-D", date: "13.06.2026", time: "21:00", h: "Katar 🇶🇦", a: "Schweiz 🇨🇭" },
         { phase: "Gruppe C", cat: "Gruppe A-D", date: "14.06.2026", time: "00:00", h: "Brasilien 🇧🇷", a: "Marokko 🇲🇦" },
-        { phase: "Gruppe C", cat: "Gruppe A-D", date: "14.06.2026", time: "03:00", h: "Haiti 🇭🇹", a: "Schottland 🏴󠁧󠁢󠁳󠁣󠁴󠁿" },
+        { phase: "Gruppe C", cat: "Gruppe A-D", date: "14.06.2026", time: "03:00", h: "Haiti 🇭🇹", a: "Schottland 🏴󠁧󠁢󠁣󠁴󠁿" },
         { phase: "Gruppe D", cat: "Gruppe A-D", date: "14.06.2026", time: "06:00", h: "Australien 🇦🇺", a: "Türkei 🇹🇷" },
         { phase: "Gruppe E", cat: "Gruppe E-H", date: "14.06.2026", time: "19:00", h: "Deutschland 🇩🇪", a: "Curaçao 🇨🇼" },
         { phase: "Gruppe F", cat: "Gruppe E-H", date: "14.06.2026", time: "22:00", h: "Niederlande 🇳🇱", a: "Japan 🇯🇵" },
@@ -137,7 +137,7 @@ function generate104Matches() {
         { phase: "Gruppe G", cat: "Gruppe E-H", date: "27.06.2026", time: "05:00", h: "Neuseeland 🇳🇿", a: "Belgien 🇧🇪" },
         { phase: "Gruppe G", cat: "Gruppe E-H", date: "27.06.2026", time: "05:00", h: "Ägypten 🇪🇬", a: "Iran 🇮🇷" },
         { phase: "Gruppe L", cat: "Gruppe I-L", date: "27.06.2026", time: "23:00", h: "Panama 🇵🇦", a: "England 🏴󠁧󠁢󠁥󠁮󠁧󠁿" },
-        { phase: "Gruppe L", cat: "Gruppe I-L", date: "27.06.2026", time: "23:00", h: "Kroatien 🇭🇷", a: "Ghana 🇬🇭" },
+        { phase: "Gruppe L", cat: "Gruppe I-L", date: "27.06.2026", time: "23:00", h: "Kroatien 🇭🇷", a: "Ghana 🇬Gh" },
         { phase: "Gruppe K", cat: "Gruppe I-L", date: "25.06.2026", time: "01:30", h: "Kolumbien 🇨🇴", a: "Portugal 🇵🇹" },
         { phase: "Gruppe K", cat: "Gruppe I-L", date: "28.06.2026", time: "01:30", h: "DR Kongo 🇨🇩", a: "Usbekistan 🇺🇿" },
         { phase: "Gruppe J", cat: "Gruppe I-L", date: "28.06.2026", time: "04:00", h: "Jordanien 🇯🇴", a: "Argentinien 🇦🇷" },
@@ -416,6 +416,7 @@ function calculatePoints(tHome, tAway, rHome, rAway) {
     return 0; 
 }
 
+// 👁️ DIE NEUE ENTDECKER-FUNKTION (Jeder sieht die Live-Tipps von jedem unter dem Spiel)
 function renderMatches() {
     const container = document.getElementById("matches-container");
     if(!container) return;
@@ -425,15 +426,37 @@ function renderMatches() {
     const filteredMatches = matches.filter(m => filterValue === "ALL" || m.filterCategory === filterValue);
 
     filteredMatches.forEach(match => {
-        const existingTip = serverTips.find(t => t.user === currentUser && t.matchId === match.id);
+        const myExistingTip = serverTips.find(t => t.user === currentUser && t.matchId === match.id);
         const matchResult = serverResults[match.id];
 
-        let valHome = existingTip ? existingTip.homeGoals : "";
-        let valAway = existingTip ? existingTip.awayGoals : "";
+        let valHome = myExistingTip ? myExistingTip.homeGoals : "";
+        let valAway = myExistingTip ? myExistingTip.awayGoals : "";
         
         if (isAdmin && matchResult) {
             valHome = matchResult.home;
             valAway = matchResult.away;
+        }
+
+        // HIER WERDEN ALLE ABGEGEBENEN TIPPS FÜR DIESES MATCH GELADEN
+        const allTipsForThisMatch = serverTips.filter(t => t.matchId === match.id);
+        let everybodyTipsHTML = "";
+
+        if (allTipsForThisMatch.length > 0) {
+            everybodyTipsHTML = `<div class="all-users-tips" style="margin-top: 12px; padding-top: 10px; border-top: 1px dotted #cbd5e0; font-size: 0.85rem; color: #4a5568;">`;
+            everybodyTipsHTML += `<strong style="display:block; margin-bottom:5px; color:#718096;">💡 Tipps der anderen Teilnehmer:</strong>`;
+            
+            allTipsForThisMatch.forEach(t => {
+                let pointsInfo = "";
+                if (matchResult) {
+                    const p = calculatePoints(t.homeGoals, t.awayGoals, matchResult.home, matchResult.away);
+                    pointsInfo = ` (+${p} Pkt.)`;
+                }
+                everybodyTipsHTML += `<span style="background: #edf2f7; padding: 4px 8px; border-radius: 4px; margin-right: 6px; margin-bottom: 6px; display: inline-block; border: 1px solid #e2e8f0;">👤 ${t.user}: <strong>${t.score}</strong>${pointsInfo}</span>`;
+            });
+            
+            everybodyTipsHTML += `</div>`;
+        } else {
+            everybodyTipsHTML = `<div style="margin-top: 8px; font-size: 0.8rem; color: #a0aec0; font-style: italic;">Noch keine Tipps von anderen vorhanden.</div>`;
         }
 
         let buttonHTML = `<button onclick="saveTip(${match.id}, '${match.home} - ${match.away}', '${match.phase}')" style="background:#48bb78; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer;">Tippen</button>`;
@@ -444,15 +467,15 @@ function renderMatches() {
         let infoErgebnisText = "";
         if (matchResult) {
             let punkteUserText = "";
-            if (existingTip && !isAdmin) {
-                const p = calculatePoints(existingTip.homeGoals, existingTip.awayGoals, matchResult.home, matchResult.away);
-                punkteUserText = ` | Tipp-Punkte: <strong style="color:#2b6cb0;">+${p}</strong>`;
+            if (myExistingTip && !isAdmin) {
+                const p = calculatePoints(myExistingTip.homeGoals, myExistingTip.awayGoals, matchResult.home, matchResult.away);
+                punkteUserText = ` | Deine Punkte: <strong style="color:#2b6cb0;">+${p}</strong>`;
             }
             infoErgebnisText = `<br><span style="color:#e53e3e;font-weight:bold;">Ergebnis: ${matchResult.home}:${matchResult.away}</span>${punkteUserText}`;
         }
 
         container.innerHTML += `
-            <div class="match-card">
+            <div class="match-card" style="background:white; padding:15px; border-radius:8px; margin-bottom:15px; box-shadow:0 2px 4px rgba(0,0,0,0.05);">
                 <div class="match-info">
                     <strong>Spiel ${match.id}</strong> - <span style="color:#3182ce;">📅 ${match.date} um ${match.time} Uhr</span><br>
                     <small>${match.phase}</small>
@@ -460,7 +483,7 @@ function renderMatches() {
                 </div>
 
                 <div class="poster-row tipp-zeile" style="display:flex; align-items:center; gap:10px; margin: 10px 0;">
-                    <span class="poster-label">Dein Tipp:</span>
+                    <span class="poster-label" style="font-weight:bold; color:#718096; width:75px;">Dein Tipp:</span>
                     <span class="team-home">${match.home}</span>
                     <input type="number" class="tipp-box" id="home-${match.id}" min="0" placeholder="0" value="${valHome}" style="width:50px; text-align:center; padding:6px;">
                     <span class="trenner">:</span>
@@ -469,6 +492,8 @@ function renderMatches() {
                 </div>
 
                 <div class="action-buttons" style="margin-top:10px;">${buttonHTML}</div>
+                
+                ${everybodyTipsHTML}
             </div>
         `;
     });

@@ -1,9 +1,9 @@
-// ⚠️ DEINE DATEN VON SUPABASE
+// ⚠️ HIER DEINE DATEN VON SUPABASE EINTRAGEN!
 const SUPABASE_URL = "https://abzivpkrhespyvubtcer.supabase.co"; 
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFieml2cGtyaGVzcHl2dWJ0Y2VyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0MjQ0MzIsImV4cCI6MjA5NjAwMDQzMn0.V2_K_GOQIgvhTmHRDl5y0EyF0AbeopYJ-u8ermrgOl8";
 
 let currentUser = localStorage.getItem("wm_user_2026") || "";
-let currentPin = localStorage.getItem("wm_pin_2026") || ""; 
+let currentPin = localStorage.getItem("wm_pin_2026") || ""; // Merkt sich die PIN
 let isAdmin = false;
 const matches = [];
 
@@ -13,128 +13,20 @@ let serverBonusTips = {};
 
 const ADMIN_PASSWORD = "wm2026admin"; 
 
-// 📅 DER KOMPLETTE SPIELPLAN (ALLE 104 SPIELE)
-const gruppenMatches = [
-    // Spielrunde 1
-    { phase: "Gruppe A", date: "11.06.2026", time: "21:00", h: "Mexiko 🇲🇽", a: "Südafrika 🇿🇦" },
-    { phase: "Gruppe A", date: "12.06.2026", time: "04:00", h: "Südkorea 🇰🇷", a: "Tschechien 🇨🇿" },
-    { phase: "Gruppe B", date: "12.06.2026", time: "21:00", h: "Kanada 🇨🇦", a: "Bosnien-Herzegowina 🇧🇦" },
-    { phase: "Gruppe D", date: "13.06.2026", time: "03:00", h: "USA 🇺🇸", a: "Paraguay 🇵🇾" },
-    { phase: "Gruppe B", date: "13.06.2026", time: "21:00", h: "Katar 🇶🇦", a: "Schweiz 🇨🇭" },
-    { phase: "Gruppe C", date: "14.06.2026", time: "00:00", h: "Brasilien 🇧🇷", a: "Marokko 🇲🇦" },
-    { phase: "Gruppe C", date: "14.06.2026", time: "03:00", h: "Haiti 🇭🇹", a: "Schottland 🏴󠁧󠁢󠁳󠁣󠁴󠁿" },
-    { phase: "Gruppe D", date: "14.06.2026", time: "06:00", h: "Australien 🇦🇺", a: "Türkei 🇹🇷" },
-    { phase: "Gruppe E", date: "14.06.2026", time: "19:00", h: "Deutschland 🇩🇪", a: "Curaçao 🇨🇼" },
-    { phase: "Gruppe F", date: "14.06.2026", time: "22:00", h: "Niederlande 🇳🇱", a: "Japan 🇯🇵" },
-    { phase: "Gruppe E", date: "15.06.2026", time: "01:00", h: "Elfenbeinküste 🇨🇮", a: "Ecuador 🇪🇨" },
-    { phase: "Gruppe F", date: "15.06.2026", time: "04:00", h: "Schweden 🇸🇪", a: "Tunesien 🇹🇳" },
-    { phase: "Gruppe H", date: "15.06.2026", time: "18:00", h: "Spanien 🇪🇸", a: "Kap Verde 🇨🇻" },
-    { phase: "Gruppe G", date: "15.06.2026", time: "21:00", h: "Belgien 🇧🇪", a: "Ägypten 🇪🇬" },
-    { phase: "Gruppe H", date: "16.06.2026", time: "00:00", h: "Saudi-Arabien 🇸🇦", a: "Uruguay 🇺🇾" },
-    { phase: "Gruppe G", date: "16.06.2026", time: "03:00", h: "Iran 🇮🇷", a: "Neuseeland 🇳🇿" },
-    { phase: "Gruppe I", date: "16.06.2026", time: "21:00", h: "Frankreich 🇫🇷", a: "Senegal 🇸🇳" },
-    { phase: "Gruppe I", date: "17.06.2026", time: "00:00", h: "Irak 🇮🇶", a: "Norwegen 🇳🇴" },
-    { phase: "Gruppe J", date: "17.06.2026", time: "03:00", h: "Argentinien 🇦🇷", a: "Algerien 🇩🇿" },
-    { phase: "Gruppe J", date: "17.06.2026", time: "06:00", h: "Österreich 🇦🇹", a: "Jordanien 🇯🇴" },
-    { phase: "Gruppe K", date: "17.06.2026", time: "19:00", h: "Portugal 🇵🇹", a: "DR Kongo 🇨🇩" },
-    { phase: "Gruppe L", date: "17.06.2026", time: "22:00", h: "England 🏴󠁧󠁢󠁥󠁮󠁧󠁿", a: "Kroatien 🇭🇷" },
-    { phase: "Gruppe L", date: "18.06.2026", time: "01:00", h: "Ghana 🇬🇭", a: "Panama 🇵🇦" },
-    { phase: "Gruppe K", date: "18.06.2026", time: "04:00", h: "Usbekistan 🇺🇿", a: "Kolumbien 🇨🇴" },
-
-    // Spielrunde 2
-    { phase: "Gruppe A", date: "18.06.2026", time: "18:00", h: "Tschechien 🇨🇿", a: "Südafrika 🇿🇦" },
-    { phase: "Gruppe B", date: "18.06.2026", time: "21:00", h: "Schweiz 🇨🇭", a: "Bosnien-Herzegowina 🇧🇦" },
-    { phase: "Gruppe B", date: "19.06.2026", time: "00:00", h: "Kanada 🇨🇦", a: "Katar 🇶🇦" },
-    { phase: "Gruppe A", date: "19.06.2026", time: "03:00", h: "Mexiko 🇲🇽", a: "Südkorea 🇰🇷" },
-    { phase: "Gruppe D", date: "19.06.2026", time: "21:00", h: "USA 🇺🇸", a: "Australien 🇦🇺" },
-    { phase: "Gruppe C", date: "20.06.2026", time: "00:00", h: "Schottland 🏴󠁧󠁢󠁳󠁣󠁴󠁿", a: "Marokko 🇲🇦" },
-    { phase: "Gruppe C", date: "20.06.2026", time: "03:00", h: "Brasilien 🇧🇷", a: "Haiti 🇭🇹" },
-    { phase: "Gruppe D", date: "20.06.2026", time: "06:00", h: "Türkei 🇹🇷", a: "Paraguay 🇵🇾" },
-    { phase: "Gruppe F", date: "20.06.2026", time: "19:00", h: "Niederlande 🇳🇱", a: "Japan 🇯🇵" },
-    { phase: "Gruppe E", date: "20.06.2026", time: "22:00", h: "Deutschland 🇩🇪", a: "Elfenbeinküste 🇨🇮" },
-    { phase: "Gruppe E", date: "21.06.2026", time: "02:00", h: "Ecuador 🇪🇨", a: "Curaçao 🇨🇼" },
-    { phase: "Gruppe F", date: "21.06.2026", time: "06:00", h: "Tunesien 🇹🇳", a: "Schweden 🇸🇪" },
-    { phase: "Gruppe H", date: "21.06.2026", time: "18:00", h: "Spanien 🇪🇸", a: "Kap Verde 🇨🇻" },
-    { phase: "Gruppe G", date: "21.06.2026", time: "21:00", h: "Belgien 🇧🇪", a: "Ägypten 🇪🇬" },
-    { phase: "Gruppe H", date: "22.06.2026", time: "00:00", h: "Uruguay 🇺🇾", a: "Saudi-Arabien 🇸🇦" },
-    { phase: "Gruppe G", date: "22.06.2026", time: "03:00", h: "Iran 🇮🇷", a: "Neuseeland 🇳🇿" },
-    { phase: "Gruppe J", date: "22.06.2026", time: "19:00", h: "Argentinien 🇦🇷", a: "Österreich 🇦🇹" },
-    { phase: "Gruppe I", date: "22.06.2026", time: "23:00", h: "Frankreich 🇫🇷", a: "Irak 🇮🇶" },
-    { phase: "Gruppe I", date: "23.06.2026", time: "02:00", h: "Norwegen 🇳🇴", a: "Senegal 🇸🇳" },
-    { phase: "Gruppe J", date: "23.06.2026", time: "06:00", h: "Jordanien 🇯🇴", a: "Algerien 🇩🇿" },
-    { phase: "Gruppe K", date: "23.06.2026", time: "19:00", h: "Portugal 🇵🇹", a: "Usbekistan 🇺🇿" },
-    { phase: "Gruppe L", date: "23.06.2026", time: "22:00", h: "England 🏴󠁧󠁢󠁥󠁮󠁧󠁿", a: "Ghana 🇬🇭" },
-    { phase: "Gruppe L", date: "24.06.2026", time: "01:00", h: "Panama 🇵🇦", a: "Kroatien 🇭🇷" },
-    { phase: "Gruppe K", date: "24.06.2026", time: "04:00", h: "Kolumbien 🇨🇴", a: "DR Kongo 🇨🇩" },
-
-    // Spielrunde 3
-    { phase: "Gruppe A", date: "24.06.2026", time: "21:00", h: "Südafrika 🇿🇦", a: "Südkorea 🇰🇷" },
-    { phase: "Gruppe A", date: "24.06.2026", time: "21:00", h: "Tschechien 🇨🇿", a: "Mexiko 🇲🇽" },
-    { phase: "Gruppe B", date: "25.06.2026", time: "00:00", h: "Bosnien-Herzegowina 🇧🇦", a: "Katar 🇶🇦" },
-    { phase: "Gruppe B", date: "25.06.2026", time: "00:00", h: "Schweiz 🇨🇭", a: "Kanada 🇨🇦" },
-    { phase: "Gruppe C", date: "25.06.2026", time: "21:00", h: "Marokko 🇲🇦", a: "Haiti 🇭🇹" },
-    { phase: "Gruppe C", date: "25.06.2026", time: "21:00", h: "Schottland 🏴󠁧󠁢󠁳󠁣󠁴󠁿", a: "Brasilien 🇧🇷" },
-    { phase: "Gruppe D", date: "26.06.2026", time: "00:00", h: "Paraguay 🇵🇾", a: "Australien 🇦🇺" },
-    { phase: "Gruppe D", date: "26.06.2026", time: "00:00", h: "Türkei 🇹🇷", a: "USA 🇺🇸" },
-    { phase: "Gruppe E", date: "26.06.2026", time: "21:00", h: "Curaçao 🇨🇼", a: "Elfenbeinküste 🇨🇮" },
-    { phase: "Gruppe E", date: "26.06.2026", time: "21:00", h: "Ecuador 🇪🇨", a: "Deutschland 🇩🇪" },
-    { phase: "Gruppe F", date: "27.06.2026", time: "00:00", h: "Japan 🇯🇵", a: "Tunesien 🇹🇳" },
-    { phase: "Gruppe F", date: "27.06.2026", time: "00:00", h: "Schweden 🇸🇪", a: "Niederlande 🇳🇱" },
-    { phase: "Gruppe G", date: "27.06.2026", time: "21:00", h: "Ägypten 🇪🇬", a: "Iran 🇮🇷" },
-    { phase: "Gruppe G", date: "27.06.2026", time: "21:00", h: "Neuseeland 🇳🇿", a: "Belgien 🇧🇪" },
-    { phase: "Gruppe H", date: "28.06.2026", time: "00:00", h: "Kap Verde 🇨🇻", a: "Saudi-Arabien 🇸🇦" },
-    { phase: "Gruppe H", date: "28.06.2026", time: "00:00", h: "Uruguay 🇺🇾", a: "Spanien 🇪🇸" },
-    { phase: "Gruppe I", date: "28.06.2026", time: "21:00", h: "Senegal 🇸🇳", a: "Irak 🇮🇶" },
-    { phase: "Gruppe I", date: "28.06.2026", time: "21:00", h: "Norwegen 🇳🇴", a: "Frankreich 🇫🇷" },
-    { phase: "Gruppe J", date: "29.06.2026", time: "00:00", h: "Algerien 🇩🇿", a: "Österreich 🇦🇹" },
-    { phase: "Gruppe J", date: "29.06.2026", time: "00:00", h: "Jordanien 🇯🇴", a: "Argentinien 🇦🇷" },
-    { phase: "Gruppe K", date: "29.06.2026", time: "21:00", h: "DR Kongo 🇨🇩", a: "Usbekistan 🇺🇿" },
-    { phase: "Gruppe K", date: "29.06.2026", time: "21:00", h: "Kolumbien 🇨🇴", a: "Portugal 🇵🇹" },
-    { phase: "Gruppe L", date: "30.06.2026", time: "00:00", h: "Kroatien 🇭🇷", a: "Ghana 🇬🇭" },
-    { phase: "Gruppe L", date: "30.06.2026", time: "00:00", h: "Panama 🇵🇦", a: "England 🏴󠁧󠁢󠁥󠁮󠁧󠁿" },
-
-    // K.o.-Runde der letzten 32
-    { phase: "Sechzehntelfinale", date: "03.07.2026", time: "21:00", h: "Sieger Gruppe A", a: "Zweiter Gruppe C" },
-    { phase: "Sechzehntelfinale", date: "04.07.2026", time: "01:00", h: "Sieger Gruppe B", a: "Dritter Gruppe A/C/D" },
-    { phase: "Sechzehntelfinale", date: "04.07.2026", time: "18:00", h: "Zweiter Gruppe A", a: "Zweiter Gruppe B" },
-    { phase: "Sechzehntelfinale", date: "04.07.2026", time: "22:00", h: "Sieger Gruppe C", a: "Zweiter Gruppe D" },
-    { phase: "Sechzehntelfinale", date: "05.07.2026", time: "18:00", h: "Sieger Gruppe E", a: "Zweiter Gruppe F" },
-    { phase: "Sechzehntelfinale", date: "05.07.2026", time: "22:00", h: "Sieger Gruppe F", a: "Dritter Gruppe C/E/F" },
-    { phase: "Sechzehntelfinale", date: "06.07.2026", time: "18:00", h: "Sieger Gruppe G", a: "Zweiter Gruppe H" },
-    { phase: "Sechzehntelfinale", date: "06.07.2026", time: "22:00", h: "Sieger Gruppe H", a: "Dritter Gruppe E/G/H" },
-    { phase: "Sechzehntelfinale", date: "07.07.2026", time: "18:00", h: "Sieger Gruppe I", a: "Zweiter Gruppe J" },
-    { phase: "Sechzehntelfinale", date: "07.07.2026", time: "22:00", h: "Sieger Gruppe J", a: "Dritter Gruppe I/K/L" },
-    { phase: "Sechzehntelfinale", date: "08.07.2026", time: "18:00", h: "Sieger Gruppe K", a: "Zweiter Gruppe L" },
-    { phase: "Sechzehntelfinale", date: "08.07.2026", time: "22:00", h: "Sieger Gruppe L", a: "Zweiter Gruppe K" },
-    { phase: "Sechzehntelfinale", date: "09.07.2026", time: "18:00", h: "Sieger Gruppe D", a: "Dritter Gruppe B/F/G" },
-    { phase: "Sechzehntelfinale", date: "09.07.2026", time: "22:00", h: "Zweiter Gruppe I", a: "Zweiter Gruppe E" },
-    { phase: "Sechzehntelfinale", date: "10.07.2026", time: "18:00", h: "Zweiter Gruppe G", a: "Zweiter Gruppe J" },
-    { phase: "Sechzehntelfinale", date: "10.07.2026", time: "22:00", h: "Zweiter Gruppe B", a: "Zweiter Gruppe F" },
-
-    // Achtelfinale
-    { phase: "Achtelfinale", date: "11.07.2026", time: "22:00", h: "Gewinner S1", a: "Gewinner S2" },
-    { phase: "Achtelfinale", date: "12.07.2026", time: "02:00", h: "Gewinner S3", a: "Gewinner S4" },
-    { phase: "Achtelfinale", date: "12.07.2026", time: "22:00", h: "Gewinner S5", a: "Gewinner S6" },
-    { phase: "Achtelfinale", date: "13.07.2026", time: "02:00", h: "Gewinner S7", a: "Gewinner S8" },
-    { phase: "Achtelfinale", date: "13.07.2026", time: "22:00", h: "Gewinner S9", a: "Gewinner S10" },
-    { phase: "Achtelfinale", date: "14.07.2026", time: "02:00", h: "Gewinner S11", a: "Gewinner S12" },
-    { phase: "Achtelfinale", date: "14.07.2026", time: "22:00", h: "Gewinner S13", a: "Gewinner S14" },
-    { phase: "Achtelfinale", date: "15.07.2026", time: "02:00", h: "Gewinner S15", a: "Gewinner S16" },
-
-    // Viertelfinale
-    { phase: "Viertelfinale", date: "17.07.2026", time: "21:00", h: "Gewinner A1", a: "Gewinner A2" },
-    { phase: "Viertelfinale", date: "18.07.2026", time: "02:00", h: "Gewinner A3", a: "Gewinner A4" },
-    { phase: "Viertelfinale", date: "18.07.2026", time: "21:00", h: "Gewinner A5", a: "Gewinner A6" },
-    { phase: "Viertelfinale", date: "19.07.2026", time: "02:00", h: "Gewinner A7", a: "Gewinner A8" },
-
-    // Halbfinale
-    { phase: "Halbfinale", date: "22.07.2026", time: "22:00", h: "Gewinner V1", a: "Gewinner V2" },
-    { phase: "Halbfinale", date: "23.07.2026", time: "22:00", h: "Gewinner V3", a: "Gewinner V4" },
-
-    // Platz 3 & Finale
-    { phase: "Spiel um Platz 3", date: "25.07.2026", time: "22:00", h: "Verlierer H1", a: "Verlierer H2" },
-    { phase: "Finale", date: "26.07.2026", time: "21:00", h: "Gewinner H1", a: "Gewinner H2" }
-];
+const gruppenDaten = {
+    "Gruppe A": ["Mexiko 🇲🇽", "Südafrika 🇿🇦", "Südkorea 🇰🇷", "Tschechien 🇨🇿"],
+    "Gruppe B": ["Kanada 🇨🇦", "Bosnien-Herzegowina 🇧🇦", "Katar 🇶🇦", "Schweiz 🇨🇭"],
+    "Gruppe C": ["Brasilien 🇧🇷", "Marokko 🇲🇦", "Haiti 🇭🇹", "Schottland 🏴󠁧󠁢󠁳󠁣󠁴󠁿"],
+    "Gruppe D": ["USA 🇺🇸", "Paraguay 🇵🇾", "Australien 🇦🇺", "Türkei 🇹🇷"],
+    "Gruppe E": ["Deutschland 🇩🇪", "Curaçao 🇨🇼", "Elfenbeinküste 🇨🇮", "Ecuador 🇪🇨"],
+    "Gruppe F": ["Niederlande 🇳🇱", "Japan 🇯🇵", "Schweden 🇸🇪", "Tunesien 🇹🇳"],
+    "Gruppe G": ["Belgien 🇧🇪", "Ägypten 🇪🇬", "Iran 🇮🇷", "Neuseeland 🇳🇿"],
+    "Gruppe H": ["Spanien 🇪🇸", "Kap Verde 🇨🇻", "Saudi-Arabien 🇸🇦", "Uruguay 🇺🇾"],
+    "Gruppe I": ["Frankreich 🇫🇷", "Senegal 🇸🇳", "Irak 🇮🇶", "Norwegen 🇳🇴"],
+    "Gruppe J": ["Argentinien 🇦🇷", "Algerien 🇩🇿", "Österreich 🇦🇹", "Jordanien 🇯🇴"],
+    "Gruppe K": ["Portugal 🇵🇹", "DR Kongo 🇨🇩", "Usbekistan 🇺🇿", "Kolumbien 🇨🇴"],
+    "Gruppe L": ["England 🏴󠁧󠁢󠁥󠁮󠁧󠁿", "Kroatien 🇭🇷", "Ghana 🇬🇭", "Panama 🇵🇦"]
+};
 
 // 🌐 DATEN AUS SUPABASE LADEN (GET)
 async function getFromSupabase(table) {
@@ -154,7 +46,7 @@ async function getFromSupabase(table) {
     }
 }
 
-// 🌐 DATEN SPEICHERN ODER AKTUALISIEREN (POST / PATCH)
+// 🌐 DATEN IN SUPABASE SPEICHERN ODER AKTUALISIEREN (POST / PATCH)
 async function saveToSupabase(table, body, method = "POST", rowId = null) {
     let url = `${SUPABASE_URL}/rest/v1/${table}`;
     
@@ -178,12 +70,269 @@ async function saveToSupabase(table, body, method = "POST", rowId = null) {
         return true;
     } catch (e) {
         console.error(e);
-        alert("Fehler beim Speichern: " + e.message);
+        alert("Fehler beim Speichern in der Cloud: " + e.message);
         return false;
     }
 }
 
-// 👤 TIPPER ANMELDEN
+// 📅 GENERIERUNG ALLER 104 SPIELE
+function generate104Matches() {
+    const gruppenMatches = [
+        { phase: "Gruppe A", cat: "Gruppe A-D", date: "11.06.2026", time: "21:00", h: "Mexiko 🇲🇽", a: "Südafrika 🇿🇦" },
+        { phase: "Gruppe A", cat: "Gruppe A-D", date: "12.06.2026", time: "04:00", h: "Südkorea 🇰🇷", a: "Tschechien 🇨🇿" },
+        { phase: "Gruppe B", cat: "Gruppe A-D", date: "12.06.2026", time: "21:00", h: "Kanada 🇨🇦", a: "Bosnien-Herzegowina 🇧🇦" },
+        { phase: "Gruppe D", cat: "Gruppe A-D", date: "13.06.2026", time: "03:00", h: "USA 🇺🇸", a: "Paraguay 🇵🇾" },
+        { phase: "Gruppe B", cat: "Gruppe A-D", date: "13.06.2026", time: "21:00", h: "Katar 🇶🇦", a: "Schweiz 🇨🇭" },
+        { phase: "Gruppe C", cat: "Gruppe A-D", date: "14.06.2026", time: "00:00", h: "Brasilien 🇧🇷", a: "Marokko 🇲🇦" },
+        { phase: "Gruppe C", cat: "Gruppe A-D", date: "14.06.2026", time: "03:00", h: "Haiti 🇭🇹", a: "Schottland 🏴󠁧󠁢󠁳󠁣󠁴󠁿" },
+        { phase: "Gruppe D", cat: "Gruppe A-D", date: "14.06.2026", time: "06:00", h: "Australien 🇦🇺", a: "Türkei 🇹🇷" },
+        { phase: "Gruppe E", cat: "Gruppe E-H", date: "14.06.2026", time: "19:00", h: "Deutschland 🇩🇪", a: "Curaçao 🇨🇼" },
+        { phase: "Gruppe F", cat: "Gruppe E-H", date: "14.06.2026", time: "22:00", h: "Niederlande 🇳🇱", a: "Japan 🇯🇵" },
+        { phase: "Gruppe E", cat: "Gruppe E-H", date: "15.06.2026", time: "01:00", h: "Elfenbeinküste 🇨🇮", a: "Ecuador 🇪🇨" },
+        { phase: "Gruppe F", cat: "Gruppe E-H", date: "15.06.2026", time: "04:00", h: "Schweden 🇸🇪", a: "Tunesien 🇹🇳" },
+        { phase: "Gruppe H", cat: "Gruppe E-H", date: "15.06.2026", time: "18:00", h: "Spanien 🇪🇸", a: "Kap Verde 🇨🇻" },
+        { phase: "Gruppe G", cat: "Gruppe E-H", date: "15.06.2026", time: "21:00", h: "Belgien 🇧🇪", a: "Ägypten 🇪🇬" },
+        { phase: "Gruppe H", cat: "Gruppe E-H", date: "16.06.2026", time: "00:00", h: "Saudi-Arabien 🇸🇦", a: "Uruguay 🇺🇾" },
+        { phase: "Gruppe G", cat: "Gruppe E-H", date: "16.06.2026", time: "03:00", h: "Iran 🇮🇷", a: "Neuseeland 🇳🇿" },
+        { phase: "Gruppe I", cat: "Gruppe I-L", date: "16.06.2026", time: "21:00", h: "Frankreich 🇫🇷", a: "Senegal 🇸🇳" },
+        { phase: "Gruppe I", cat: "Gruppe I-L", date: "17.06.2026", time: "00:00", h: "Irak 🇮🇶", a: "Norwegen 🇳🇴" },
+        { phase: "Gruppe J", cat: "Gruppe I-L", date: "17.06.2026", time: "03:00", h: "Argentinien 🇦🇷", a: "Algerien 🇩🇿" },
+        { phase: "Gruppe J", cat: "Gruppe I-L", date: "17.06.2026", time: "06:00", h: "Österreich 🇦🇹", a: "Jordanien 🇯🇴" },
+        { phase: "Gruppe K", cat: "Gruppe I-L", date: "17.06.2026", time: "19:00", h: "Portugal 🇵🇹", a: "DR Kongo 🇨🇩" },
+        { phase: "Gruppe L", cat: "Gruppe I-L", date: "17.06.2026", time: "22:00", h: "England 🏴󠁧󠁢󠁥󠁮󠁧󠁿", a: "Kroatien 🇭🇷" },
+        { phase: "Gruppe L", cat: "Gruppe I-L", date: "18.06.2026", time: "01:00", h: "Ghana 🇬🇭", a: "Panama 🇵🇦" },
+        { phase: "Gruppe K", cat: "Gruppe I-L", date: "18.06.2026", time: "04:00", h: "Usbekistan 🇺🇿", a: "Kolumbien 🇨🇴" },
+        { phase: "Gruppe A", cat: "Gruppe A-D", date: "18.06.2026", time: "18:00", h: "Tschechien 🇨🇿", a: "Südafrika 🇿🇦" },
+        { phase: "Gruppe B", cat: "Gruppe A-D", date: "18.06.2026", time: "21:00", h: "Schweiz 🇨🇭", a: "Bosnien-Herzegowina 🇧🇦" },
+        { phase: "Gruppe B", cat: "Gruppe A-D", date: "19.06.2026", time: "00:00", h: "Kanada 🇨🇦", a: "Katar 🇶🇦" },
+        { phase: "Gruppe A", cat: "Gruppe A-D", date: "19.06.2026", time: "03:00", h: "Mexiko 🇲🇽", a: "Südkorea 🇰🇷" },
+        { phase: "Gruppe D", cat: "Gruppe A-D", date: "19.06.2026", time: "21:00", h: "USA 🇺🇸", a: "Australien 🇦🇺" },
+        { phase: "Gruppe C", cat: "Gruppe A-D", date: "20.06.2026", time: "00:00", h: "Schottland 🏴󠁧󠁢󠁳󠁣󠁴󠁿", a: "Marokko 🇲🇦" },
+        { phase: "Gruppe C", cat: "Gruppe A-D", date: "20.06.2026", time: "03:00", h: "Brasilien 🇧🇷", a: "Haiti 🇭🇹" },
+        { phase: "Gruppe D", cat: "Gruppe A-D", date: "20.06.2026", time: "06:00", h: "Türkei 🇹🇷", a: "Paraguay 🇵🇾" },
+        { phase: "Gruppe F", cat: "Gruppe E-H", date: "20.06.2026", time: "19:00", h: "Niederlande 🇳🇱", a: "Japan 🇯🇵" },
+        { phase: "Gruppe E", cat: "Gruppe E-H", date: "20.06.2026", time: "22:00", h: "Deutschland 🇩🇪", a: "Elfenbeinküste 🇨🇮" },
+        { phase: "Gruppe E", cat: "Gruppe E-H", date: "21.06.2026", time: "02:00", h: "Ecuador 🇪🇨", a: "Curaçao 🇨🇼" },
+        { phase: "Gruppe F", cat: "Gruppe E-H", date: "21.06.2026", time: "06:00", h: "Tunesien 🇹🇳", a: "Japan 🇯🇵" },
+        { phase: "Gruppe H", cat: "Gruppe E-H", date: "21.06.2026", time: "18:00", h: "Spanien 🇪🇸", a: "Kap Verde 🇨🇻" },
+        { phase: "Gruppe G", cat: "Gruppe E-H", date: "21.06.2026", time: "21:00", h: "Belgien 🇧🇪", a: "Ägypten 🇪🇬" },
+        { phase: "Gruppe H", cat: "Gruppe E-H", date: "22.06.2026", time: "00:00", h: "Uruguay 🇺🇾", a: "Saudi-Arabien 🇸🇦" },
+        { phase: "Gruppe G", cat: "Gruppe E-H", date: "22.06.2026", time: "03:00", h: "Iran 🇮🇷", a: "Neuseeland 🇳🇿" },
+        { phase: "Gruppe J", cat: "Gruppe I-L", date: "22.06.2026", time: "19:00", h: "Argentinien 🇦🇷", a: "Österreich 🇦🇹" },
+        { phase: "Gruppe I", cat: "Gruppe I-L", date: "22.06.2026", time: "23:00", h: "Frankreich 🇫🇷", a: "Irak 🇮🇶" },
+        { phase: "Gruppe I", cat: "Gruppe I-L", date: "23.06.2026", time: "02:00", h: "Norwegen 🇳🇴", a: "Senegal 🇸🇳" },
+        { phase: "Gruppe J", cat: "Gruppe I-L", date: "23.06.2026", time: "05:00", h: "Jordanien 🇯🇴", a: "Algerien 🇩🇿" },
+        { phase: "Gruppe K", cat: "Gruppe I-L", date: "23.06.2026", time: "19:00", h: "Portugal 🇵🇹", a: "Usbekistan 🇺🇿" },
+        { phase: "Gruppe L", cat: "Gruppe I-L", date: "22.06.2026", time: "22:00", h: "England 🏴󠁧󠁢󠁥󠁮󠁧󠁿", a: "Kroatien 🇭🇷" },
+        { phase: "Gruppe L", cat: "Gruppe I-L", date: "24.06.2026", time: "01:00", h: "Ghana 🇬🇭", a: "Panama 🇵🇦" },
+        { phase: "Gruppe K", cat: "Gruppe I-L", date: "24.06.2026", time: "04:00", h: "Kolumbien 🇨🇴", a: "DR Kongo 🇨🇩" },
+        { phase: "Gruppe B", cat: "Gruppe A-D", date: "24.06.2026", time: "21:00", h: "Schweiz 🇨🇭", a: "Kanada 🇨🇦" },
+        { phase: "Gruppe B", cat: "Gruppe A-D", date: "24.06.2026", time: "21:00", h: "Bosnien-Herzegowina 🇧🇦", a: "Katar 🇶🇦" },
+        { phase: "Gruppe C", cat: "Gruppe A-D", date: "25.06.2026", time: "00:00", h: "Schottland 🏴󠁧󠁢󠁳󠁣󠁴󠁿", a: "Brasilien 🇧🇷" },
+        { phase: "Gruppe C", cat: "Gruppe A-D", date: "25.06.2026", time: "00:00", h: "Marokko 🇲🇦", a: "Haiti 🇭🇹" },
+        { phase: "Gruppe A", cat: "Gruppe A-D", date: "25.06.2026", time: "03:00", h: "Tschechien 🇨🇿", a: "Mexiko 🇲🇽" },
+        { phase: "Gruppe A", cat: "Gruppe A-D", date: "25.06.2026", time: "03:00", h: "Südafrika 🇿🇦", a: "Südkorea 🇰🇷" },
+        { phase: "Gruppe E", cat: "Gruppe E-H", date: "25.06.2026", time: "22:00", h: "Ecuador 🇪🇨", a: "Deutschland 🇩🇪" },
+        { phase: "Gruppe E", cat: "Gruppe E-H", date: "25.06.2026", time: "22:00", h: "Curaçao 🇨🇼", a: "Elfenbeinküste 🇨🇮" },
+        { phase: "Gruppe F", cat: "Gruppe E-H", date: "26.06.2026", time: "01:00", h: "Japan 🇯🇵", a: "Schweden 🇸🇪" },
+        { phase: "Gruppe F", cat: "Gruppe E-H", date: "26.06.2026", time: "01:00", h: "Tunesien 🇹🇳", a: "Niederlande 🇳🇱" },
+        { phase: "Gruppe D", cat: "Gruppe A-D", date: "26.06.2026", time: "04:00", h: "Türkei 🇹🇷", a: "USA 🇺🇸" },
+        { phase: "Gruppe D", cat: "Gruppe A-D", date: "26.06.2026", time: "04:00", h: "Paraguay 🇵🇾", a: "Australien 🇦🇺" },
+        { phase: "Gruppe I", cat: "Gruppe I-L", date: "26.06.2026", time: "21:00", h: "Norwegen 🇳🇴", a: "Frankreich 🇫🇷" },
+        { phase: "Gruppe I", cat: "Gruppe I-L", date: "26.06.2026", time: "21:00", h: "Senegal 🇸🇳", a: "Irak 🇮🇶" },
+        { phase: "Gruppe H", cat: "Gruppe E-H", date: "27.06.2026", time: "02:00", h: "Uruguay 🇺🇾", a: "Spanien 🇪🇸" },
+        { phase: "Gruppe H", cat: "Gruppe E-H", date: "27.06.2026", time: "02:00", h: "Kap Verde 🇨🇻", a: "Saudi-Arabien 🇸🇦" },
+        { phase: "Gruppe G", cat: "Gruppe E-H", date: "27.06.2026", time: "05:00", h: "Neuseeland 🇳🇿", a: "Belgien 🇧🇪" },
+        { phase: "Gruppe G", cat: "Gruppe E-H", date: "27.06.2026", time: "05:00", h: "Ägypten 🇪🇬", a: "Iran 🇮🇷" },
+        { phase: "Gruppe L", cat: "Gruppe I-L", date: "27.06.2026", time: "23:00", h: "Panama 🇵🇦", a: "England 🏴󠁧󠁢󠁥󠁮󠁧󠁿" },
+        { phase: "Gruppe L", cat: "Gruppe I-L", date: "27.06.2026", time: "23:00", h: "Kroatien 🇭🇷", a: "Ghana 🇬🇭" },
+        { phase: "Gruppe K", cat: "Gruppe I-L", date: "25.06.2026", time: "01:30", h: "Kolumbien 🇨🇴", a: "Portugal 🇵🇹" },
+        { phase: "Gruppe K", cat: "Gruppe I-L", date: "28.06.2026", time: "01:30", h: "DR Kongo 🇨🇩", a: "Usbekistan 🇺🇿" },
+        { phase: "Gruppe J", cat: "Gruppe I-L", date: "28.06.2026", time: "04:00", h: "Jordanien 🇯🇴", a: "Argentinien 🇦🇷" },
+        { phase: "Gruppe J", cat: "Gruppe I-L", date: "28.06.2026", time: "04:00", h: "Algerien 🇩🇿", a: "Österreich 🇦🇹" }
+    ];
+
+    const koMatches = [
+        { phase: "Sechzehntelfinale", cat: "KO", date: "28.06.2026", time: "21:00", h: "2. Gruppe A 🥈", a: "2. Gruppe B 🥈" },
+        { phase: "Sechzehntelfinale", cat: "KO", date: "29.06.2026", time: "19:00", h: "1. Gruppe C 🥇", a: "2. Gruppe F 🥈" },
+        { phase: "Sechzehntelfinale", cat: "KO", date: "29.06.2026", time: "22:30", h: "1. Gruppe E 🥇", a: "3. Gruppe A/B/C/D/F 🥉" },
+        { phase: "Sechzehntelfinale", cat: "KO", date: "30.06.2026", time: "03:00", h: "1. Gruppe F 🥇", a: "2. Gruppe C 🥈" },
+        { phase: "Sechzehntelfinale", cat: "KO", date: "30.06.2026", time: "19:00", h: "2. Gruppe E 🥈", a: "2. Gruppe I 🥈" },
+        { phase: "Sechzehntelfinale", cat: "KO", date: "30.06.2026", time: "23:00", h: "1. Gruppe I 🥇", a: "3. Gruppe C/D/F/G/H 🥉" },
+        { phase: "Sechzehntelfinale", cat: "KO", date: "01.07.2026", time: "03:00", h: "1. Gruppe A 🥇", a: "3. Gruppe C/E/F/H/I 🥉" },
+        { phase: "Sechzehntelfinale", cat: "KO", date: "01.07.2026", time: "18:00", h: "1. Gruppe L 🥇", a: "3. Gruppe E/F/G/I/K 🥉" },
+        { phase: "Sechzehntelfinale", cat: "KO", date: "01.07.2026", time: "22:00", h: "1. Gruppe G 🥇", a: "3. Gruppe A/E/H/I/J 🥉" },
+        { phase: "Sechzehntelfinale", cat: "KO", date: "02.07.2026", time: "02:00", h: "1. Gruppe D 🥇", a: "3. Gruppe B/E/F/I/J 🥉" },
+        { phase: "Sechzehntelfinale", cat: "KO", date: "02.07.2026", time: "21:00", h: "1. Gruppe H 🥇", a: "2. Gruppe J 🥈" },
+        { phase: "Sechzehntelfinale", cat: "KO", date: "03.07.2026", time: "01:00", h: "2. Gruppe K 🥈", a: "2. Gruppe L 🥈" },
+        { phase: "Sechzehntelfinale", cat: "KO", date: "03.07.2026", time: "05:00", h: "1. Gruppe B 🥇", a: "3. Gruppe E/F/G/H/I 🥉" },
+        { phase: "Sechzehntelfinale", cat: "KO", date: "03.07.2026", time: "20:00", h: "2. Gruppe D 🥈", a: "2. Gruppe G 🥈" },
+        { phase: "Sechzehntelfinale", cat: "KO", date: "04.07.2026", time: "00:00", h: "1. Gruppe J 🥇", a: "2. Gruppe H 🥈" },
+        { phase: "Sechzehntelfinale", cat: "KO", date: "04.07.2026", time: "03:30", h: "1. Gruppe K 🥇", a: "3. Gruppe D/E/I/J/L 🥉" },
+        { phase: "Achtelfinale", cat: "KO", date: "04.07.2026", time: "19:00", h: "Sieger 28.06. 21:00", a: "Sieger 29.06. 19:00" },
+        { phase: "Achtelfinale", cat: "KO", date: "04.07.2026", time: "23:00", h: "Sieger 29.06. 22:30", a: "Sieger 30.06. 03:00" },
+        { phase: "Achtelfinale", cat: "KO", date: "05.07.2026", time: "22:00", h: "Sieger 30.06. 19:00", a: "Sieger 30.06. 23:00" },
+        { phase: "Achtelfinale", cat: "KO", date: "06.07.2026", time: "02:00", h: "Sieger 01.07. 03:00", a: "Sieger 01.07. 18:00" },
+        { phase: "Achtelfinale", cat: "KO", date: "06.07.2026", time: "19:00", h: "Sieger 01.07. 22:00", a: "Sieger 02.07. 02:00" },
+        { phase: "Achtelfinale", cat: "KO", date: "07.07.2026", time: "02:00", h: "Sieger 02.07. 21:00", a: "Sieger 03.07. 01:00" },
+        { phase: "Achtelfinale", cat: "KO", date: "07.07.2026", time: "18:00", h: "Sieger 03.07. 05:00", a: "Sieger 03.07. 20:00" },
+        { phase: "Achtelfinale", cat: "KO", date: "07.07.2026", time: "22:00", h: "Sieger 04.07. 00:00", a: "Sieger 04.07. 03:30" },
+        { phase: "Viertelfinale", cat: "KO", date: "09.07.2026", time: "22:00", h: "Sieger Achtelfinale 04.07. 19:00", a: "Sieger Achtelfinale 04.07. 23:00" },
+        { phase: "Viertelfinale", cat: "KO", date: "10.07.2026", time: "21:00", h: "Sieger Achtelfinale 06.07. 19:00", a: "Sieger Achtelfinale 07.07. 02:00" },
+        { phase: "Viertelfinale", cat: "KO", date: "11.07.2026", time: "23:00", h: "Sieger Achtelfinale 05.07. 22:00", a: "Sieger Achtelfinale 06.07. 02:00" },
+        { phase: "Viertelfinale", cat: "KO", date: "12.07.2026", time: "02:00", h: "Sieger Achtelfinale 07.07. 18:00", a: "Sieger Achtelfinale 07.07. 22:00" },
+        { phase: "Halbfinale", cat: "KO", date: "14.07.2026", time: "21:00", h: "Sieger Viertelfinale 09.07.", a: "Sieger Viertelfinale 10.07." },
+        { phase: "Halbfinale", cat: "KO", date: "15.07.2026", time: "21:00", h: "Sieger Viertelfinale 11.07.", a: "Sieger Viertelfinale 12.07." },
+        { phase: "Spiel um Platz 3", cat: "KO", date: "18.07.2026", time: "23:00", h: "Verlierer Halbfinale 14.07.", a: "Verlierer Halbfinale 15.07." },
+        { phase: "💥 FINALE 💥", cat: "KO", date: "19.07.2026", time: "21:00", h: "Sieger Halbfinale 14.07.", a: "Sieger Halbfinale 15.07." }
+    ];
+
+    const allRawMatches = [...gruppenMatches, ...koMatches];
+    let matchCounter = 1;
+    matches.length = 0; 
+    allRawMatches.forEach(m => {
+        matches.push({
+            id: matchCounter++,
+            phase: m.phase,
+            filterCategory: m.cat,
+            date: m.date,
+            time: m.time,
+            home: m.h,
+            away: m.a
+        });
+    });
+}
+
+// 📊 UPDATET LOKALE VARIABLEN AUS SERVER-DATENSÄTZEN
+async function fetchServerData() {
+    const tipsData = await getFromSupabase("wm_tips");
+    const resultsData = await getFromSupabase("wm_results");
+    const bonusData = await getFromSupabase("wm_bonus_tips");
+
+    serverTips = tipsData.map(t => ({
+        id: t.id, // ID wird für gezielte Updates (PATCH) gebraucht
+        user: t.user_name, pin: t.pin, matchId: t.match_id, matchTeams: t.match_teams,
+        phase: t.phase, score: t.score, homeGoals: t.home_goals, awayGoals: t.away_goals
+    }));
+
+    serverResults = {};
+    resultsData.forEach(r => {
+        serverResults[r.match_id] = { id: r.id, home: r.home_goals, away: r.away_goals };
+    });
+
+    serverBonusTips = {};
+    bonusData.forEach(b => {
+        serverBonusTips[b.user_name] = { pin: b.pin, wm: b.wm_tip, scorer: b.scorer_tip };
+    });
+}
+
+// 📑 ERSTELLT DIE STRUKTUR UND TABS
+function buildKachelnAndTabs() {
+    let kachelLeiste = document.querySelector(".kachel-leiste");
+    if (!kachelLeiste) return;
+
+    const kachelDefinitionen = [
+        { id: "tippen", text: "⚽ Spiele & Tippen" },
+        { id: "gruppen", text: "📅 WM-Gruppen" },
+        { id: "tippspielrangliste", text: "🏆 Tippspielrangliste" },
+        { id: "wm-ergebnisse", text: "📊 Offizielle WM-Ergebnisse" }
+    ];
+
+    kachelLeiste.innerHTML = "";
+    kachelDefinitionen.forEach(k => {
+        kachelLeiste.innerHTML += `<button id="btn-${k.id}" class="kachel" onclick="switchTab('${k.id}')">${k.text}</button>`;
+    });
+
+    let contentArea = document.getElementById("tab-content-area");
+    if (!contentArea) return;
+
+    contentArea.innerHTML = `
+        <div id="tab-tippen" class="tab-content" style="display:none;"></div>
+        <div id="tab-gruppen" class="tab-content" style="display:none;">
+            <h3>📅 Offizielle WM-Gruppen</h3>
+            <div id="gruppen-container" class="gruppen-grid"></div>
+        </div>
+        <div id="tab-tippspielrangliste" class="tab-content" style="display:none; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);"></div>
+        <div id="tab-wm-ergebnisse" class="tab-content" style="display:none;">
+            <h3>📊 Offizielle WM-Ergebnisse</h3>
+            <table>
+                <thead>
+                    <tr><th>Spiel</th><th>Datum & Zeit</th><th>Begegnung</th><th>Endergebnis</th></tr>
+                </thead>
+                <tbody id="wm-results-body"></tbody>
+            </table>
+        </div>
+    `;
+
+    document.getElementById("tab-tippen").innerHTML = `
+        <div class="welcome-box" id="admin-status-bar">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px;">
+                <span id="welcome-msg" style="font-weight:bold;"></span>
+                <div style="display:flex; flex-direction:column; gap:8px; background:white; padding:15px; border-radius:8px; border:1px solid #cbd5e0; min-width:280px;" id="login-form-area">
+                    <div style="font-weight:bold; font-size:0.9rem; color:#4a5568;">👤 Tipper-Anmeldung (Mit PIN-Schutz)</div>
+                    <div style="display:flex; gap:6px;">
+                        <input type="text" id="username" placeholder="Name" style="flex:2; padding:8px; border-radius:4px; border:1px solid #cbd5e0;">
+                        <input type="password" id="userpin" placeholder="4-stg. PIN" maxlength="4" style="flex:1; padding:8px; border-radius:4px; border:1px solid #cbd5e0; text-align:center;">
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <div style="flex:1;">
+                            <label style="font-size:0.75rem; font-weight:bold; color:#718096; display:block;">🔮 Weltmeister-Tipp:</label>
+                            <input type="text" id="bonus-wm" placeholder="z.B. Brasilien" style="padding:6px; width:100%; box-sizing:border-box; border-radius:4px; border:1px solid #cbd5e0; font-size:0.85rem;">
+                        </div>
+                        <div style="flex:1;">
+                            <label style="font-size:0.75rem; font-weight:bold; color:#718096; display:block;">⚽ Top-Torjäger:</label>
+                            <input type="text" id="bonus-scorer" placeholder="z.B. Mbappé" style="padding:6px; width:100%; box-sizing:border-box; border-radius:4px; border:1px solid #cbd5e0; font-size:0.85rem;">
+                        </div>
+                    </div>
+                    <button onclick="registerUser()" style="background:#3182ce; color:white; font-weight:bold; padding:8px; border:none; border-radius:4px; cursor:pointer;">Speichern & Anmelden</button>
+                </div>
+            </div>
+        </div>
+        <div class="filter-box" style="margin: 15px 0; padding: 10px; background:#edf2f7; border-radius:8px;">
+            <label style="font-weight:bold; margin-right:10px;">Phase filtern:</label>
+            <select id="stage-filter" onchange="renderMatches()" style="padding:6px; border-radius:4px;">
+                <option value="ALL">Alle Spiele anzeigen</option>
+                <option value="Gruppe A-D">Gruppen A - D</option>
+                <option value="Gruppe E-H">Gruppen E - H</option>
+                <option value="Gruppe I-L">Gruppen I - L</option>
+                <option value="KO">K.o.-Runde</option>
+            </select>
+        </div>
+        <div id="matches-container"></div>
+    `;
+}
+
+// 🔄 SCHALTET ZWISCHEN TABS UM
+async function switchTab(tabName) {
+    document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.kachel').forEach(el => {
+        el.style.background = '#e2e8f0';
+        el.style.color = '#2d3748';
+    });
+    
+    const targetTab = document.getElementById(`tab-${tabName}`);
+    const targetBtn = document.getElementById(`btn-${tabName}`);
+    
+    if(targetTab) targetTab.style.display = 'block';
+    if(targetBtn) {
+        targetBtn.style.background = '#3182ce';
+        targetBtn.style.color = 'white';
+    }
+
+    await fetchServerData();
+
+    if (tabName === "gruppen") {
+        renderGruppen();
+    } else if (tabName === "tippspielrangliste") {
+        renderLeaderboard();
+    } else if (tabName === "wm-ergebnisse") {
+        renderWMResultsTab();
+    } else if (tabName === "tippen") {
+        renderMatches();
+    }
+}
+
+// 👤 ANMELDUNG & REGISTRIERUNG
 async function registerUser() {
     const nameInput = document.getElementById("username").value.trim();
     const pinInput = document.getElementById("userpin").value.trim();
@@ -196,16 +345,16 @@ async function registerUser() {
             isAdmin = true;
             currentUser = "Admin⚙️";
             currentPin = "";
-            alert("Als Admin autorisiert!");
+            alert("Als Admin autorisiert! Du kannst Ergebnisse setzen.");
             updateWelcomeMessage();
             renderMatches();
         } else {
-            alert("Falsches Passwort!");
+            alert("Falsches Admin-Passwort!");
         }
         return;
     }
 
-    if(pinInput.length < 4) { alert("Bitte eine 4-stellige PIN eingeben!"); return; }
+    if(pinInput.length < 4) { alert("Bitte eine 4-stellige PIN ausdenken/eingeben!"); return; }
 
     const checkUrl = `${SUPABASE_URL}/rest/v1/wm_bonus_tips?user_name=eq.${encodeURIComponent(nameInput)}`;
     let existingRowId = null;
@@ -218,11 +367,11 @@ async function registerUser() {
         const checkData = await checkRes.json();
         
         if (checkData && checkData.length > 0) {
-            if (checkData[0].pin && checkData[0].pin !== pinInput) {
-                alert(`Der Name '${nameInput}' ist bereits vergeben. Falsche PIN!`);
+            if (checkData[0].pin !== pinInput) {
+                alert(`Der Name '${nameInput}' ist bereits geschützt. Falsche PIN! Falls du ein anderer '${nameInput}' bist, hänge ein Kürzel an deinen Namen (z.B. ${nameInput}2).`);
                 return;
             }
-            existingRowId = checkData[0].id; 
+            existingRowId = checkData[0].id;
         }
     } catch(err) {
         console.error("Fehler bei Login-Prüfung", err);
@@ -236,7 +385,9 @@ async function registerUser() {
     localStorage.setItem("wm_user_2026", currentUser);
     localStorage.setItem("wm_pin_2026", currentPin);
     
-    const saveData = { user_name: currentUser, pin: currentPin, wm_tip: wmTip, scorer_tip: scorerTip };
+    const saveData = {
+        user_name: currentUser, pin: currentPin, wm_tip: wmTip, scorer_tip: scorerTip
+    };
 
     let success = false;
     if (existingRowId) {
@@ -246,15 +397,87 @@ async function registerUser() {
     }
 
     if(success) {
-        alert(`Erfolgreich angemeldet als '${currentUser}'!`);
+        alert(`Erfolgreich angemeldet als '${currentUser}'! Deine PIN ist aktiv.`);
         await fetchServerData();
         updateWelcomeMessage();
         renderMatches();
     }
 }
 
-// ⚽ SPIELTIPP ABGEBEN
-async function submitTip(matchId) {
+function updateWelcomeMessage() {
+    const welcome = document.getElementById("welcome-msg");
+    const formArea = document.getElementById("login-form-area");
+    if(!welcome) return;
+
+    if(isAdmin) {
+        document.getElementById("admin-status-bar").style.background = "#fed7d7"; 
+        welcome.innerHTML = `<span style="color:#c53030;">⚙️ Modus: <strong>Admin-Zentrale</strong></span>`;
+        formArea.innerHTML = `<button onclick="logoutAdmin()" style="background:#e53e3e; color:white; padding:8px; border-radius:4px; border:none; cursor:pointer;">Admin beenden</button>`;
+    } else if(currentUser) {
+        const userBonus = serverBonusTips[currentUser] || { wm: "Kein Tipp", scorer: "Kein Tipp" };
+
+        welcome.innerHTML = `
+            👋 Angemeldet als: <strong style="color:#3182ce; font-size:1.2rem;">${currentUser}</strong> <small style="color:#a0aec0;">(🔒 PIN aktiv)</small><br>
+            <span style="font-size:0.9rem; color:#4a5568; display:block; margin-top:5px;">
+                🔮 WM-Tipp: <strong>${userBonus.wm}</strong> | 👟 Top-Torjäger: <strong>${userBonus.scorer}</strong>
+            </span>
+        `;
+        formArea.innerHTML = `
+            <button onclick="resetLoginForm()" style="background:#4a5568; color:white; padding:8px; border-radius:4px; border:none; cursor:pointer;">User wechseln / Tipps ändern</button>
+        `;
+    } else {
+        welcome.innerText = "Bitte melde dich an, um deine Tipps abzugeben.";
+    }
+}
+
+function resetLoginForm() {
+    currentUser = "";
+    currentPin = "";
+    localStorage.removeItem("wm_user_2026");
+    localStorage.removeItem("wm_pin_2026");
+    buildKachelnAndTabs();
+    updateWelcomeMessage();
+    renderMatches();
+}
+
+function logoutAdmin() {
+    isAdmin = false;
+    currentUser = "";
+    currentPin = "";
+    localStorage.removeItem("wm_user_2026");
+    localStorage.removeItem("wm_pin_2026");
+    document.getElementById("admin-status-bar").style.background = "#edf2f7";
+    
+    buildKachelnAndTabs();
+    updateWelcomeMessage();
+    switchTab("tippen");
+}
+
+// 🧮 PUNKTEBERECHNUNG: Exakt = 4, Tendenz = 2, Falsche Tendenz aber ein richtiges Tor = 1, Sonst = 0
+function calculatePoints(tHome, tAway, rHome, rAway) {
+    const th = parseInt(tHome);
+    const ta = parseInt(tAway);
+    const rh = parseInt(rHome);
+    const ra = parseInt(rAway);
+
+    if (isNaN(th) || isNaN(ta) || isNaN(rh) || isNaN(ra)) return 0;
+    if (th === rh && ta === ra) return 4;
+    if (th === rh || ta === ra) {
+        const tippTendenz = th > ta ? 1 : (th < ta ? -1 : 0);
+        const realTendenz = rh > ra ? 1 : (rh < ra ? -1 : 0);
+        if (tippTendenz === realTendenz) return 2;
+        return 1;
+    }
+
+    const tippTendenz = th > ta ? 1 : (th < ta ? -1 : 0);
+    const realTendenz = rh > ra ? 1 : (rh < ra ? -1 : 0);
+    if (tippTendenz === realTendenz) return 2;
+
+    return 0; 
+}
+
+// ⚽ SPEICHERT ODER UPDATET EINEN TIPPSPIEL-EINTRAG
+async function saveTip(matchId, matchTeams, phase) {
     if (!currentUser || currentUser === "Admin⚙️") {
         alert("Bitte melde dich zuerst als Tipper an!");
         return;
@@ -264,221 +487,276 @@ async function submitTip(matchId) {
     const awayInput = document.getElementById(`away-tip-${matchId}`).value;
 
     if (homeInput === "" || awayInput === "") {
-        alert("Bitte beide Felder ausfüllen!");
+        alert("Bitte trage beide Felder für das Ergebnis ein!");
         return;
     }
 
     const scoreString = `${homeInput}:${awayInput}`;
+    
+    // Prüfen, ob für diesen User + PIN bereits ein Tipp für dieses Spiel existiert
+    const existingTip = serverTips.find(t => t.user === currentUser && t.pin === currentPin && t.matchId === matchId);
 
-    const checkUrl = `${SUPABASE_URL}/rest/v1/wm_tips?user_name=eq.${encodeURIComponent(currentUser)}&match_id=eq.${matchId}`;
-    let existingTipId = null;
-
-    try {
-        const res = await fetch(checkUrl, {
-            method: "GET",
-            headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
-        });
-        const data = await res.json();
-        if (data && data.length > 0) {
-            existingTipId = data[0].id;
-        }
-    } catch (e) {
-        console.error(e);
-    }
-
-    const matchObj = matches.find(m => m.id === matchId);
     const saveData = {
         user_name: currentUser,
         pin: currentPin,
         match_id: matchId,
-        match_teams: matchObj ? `${matchObj.h} - ${matchObj.a}` : "Unbekannt",
-        phase: matchObj ? matchObj.phase : "Gruppe",
-        score: scoreString
+        match_teams: matchTeams,
+        phase: phase,
+        score: scoreString,
+        home_goals: parseInt(homeInput),
+        away_goals: parseInt(awayInput)
     };
 
     let success = false;
-    if (existingTipId) {
-        success = await saveToSupabase("wm_tips", saveData, "PATCH", existingTipId);
+    if (existingTip && existingTip.id) {
+        success = await saveToSupabase("wm_tips", saveData, "PATCH", existingTip.id);
     } else {
         success = await saveToSupabase("wm_tips", saveData, "POST");
     }
 
     if (success) {
-        alert("Tipp erfolgreich gespeichert!");
+        alert("Tipp erfolgreich abgegeben!");
         await fetchServerData();
         renderMatches();
     }
 }
 
-// ⚙️ ERGEBNIS ALS ADMIN EINTRAGEN
-async function submitResult(matchId) {
+// ⚙️ ADMIN SETZT DAS ECHTE SPIELERGEBNIS
+async function saveRealResult(matchId) {
     if (!isAdmin) return;
 
-    const homeRes = document.getElementById(`home-res-${matchId}`).value;
-    const awayRes = document.getElementById(`away-res-${matchId}`).value;
+    const homeRes = document.getElementById(`home-tip-${matchId}`).value;
+    const awayRes = document.getElementById(`away-tip-${matchId}`).value;
 
     if (homeRes === "" || awayRes === "") {
         alert("Bitte beide Felder ausfüllen!");
         return;
     }
 
-    const resultString = `${homeRes}:${awayRes}`;
-
-    const checkUrl = `${SUPABASE_URL}/rest/v1/wm_results?match_id=eq.${matchId}`;
-    let existingResultId = null;
-
-    try {
-        const res = await fetch(checkUrl, {
-            method: "GET",
-            headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
-        });
-        const data = await res.json();
-        if (data && data.length > 0) {
-            existingResultId = data[0].id;
-        }
-    } catch (e) {
-        console.error(e);
-    }
-
-    const saveData = { match_id: matchId, result: resultString };
+    const existingResult = serverResults[matchId];
+    const saveData = {
+        match_id: matchId,
+        home_goals: parseInt(homeRes),
+        away_goals: parseInt(awayRes)
+    };
 
     let success = false;
-    if (existingResultId) {
-        success = await saveToSupabase("wm_results", saveData, "PATCH", existingResultId);
+    if (existingResult && existingResult.id) {
+        success = await saveToSupabase("wm_results", saveData, "PATCH", existingResult.id);
     } else {
         success = await saveToSupabase("wm_results", saveData, "POST");
     }
 
     if (success) {
-        alert("Ergebnis erfolgreich eingetragen!");
+        alert("Offizielles Ergebnis eingetragen!");
         await fetchServerData();
         renderMatches();
     }
 }
 
-// 📊 SERVERDATEN AKTUALISIEREN
-async function fetchServerData() {
-    serverTips = await getFromSupabase("wm_tips");
-    
-    const results = await getFromSupabase("wm_results");
-    serverResults = {};
-    results.forEach(r => { serverResults[r.match_id] = r.result; });
-
-    const bonus = await getFromSupabase("wm_bonus_tips");
-    serverBonusTips = {};
-    bonus.forEach(b => { serverBonusTips[b.user_name] = { wm: b.wm_tip, scorer: b.scorer_tip }; });
-}
-
-// 📑 SPIELPLAN BAUEN
-function buildMatches() {
-    if (typeof gruppenMatches !== 'undefined' && gruppenMatches.length > 0) {
-        matches.length = 0; 
-        let idCounter = 1;
-        gruppenMatches.forEach(m => {
-            matches.push({ id: idCounter++, ...m });
-        });
-    }
-}
-
-// 🖨️ WILLKOMMENSNACHRICHT ANPASSEN
-function updateWelcomeMessage() {
-    const msgZone = document.getElementById("welcome-message");
-    if(msgZone) {
-        if(currentUser) {
-            msgZone.innerHTML = `Eingeloggt als: <strong>${currentUser}</strong>`;
-        } else {
-            msgZone.innerHTML = "Bitte melde dich an, um deine Tipps abzugeben.";
-        }
-    }
-}
-
-// 🎨 SPIELE IM HTML ANZEIGEN
+// 🎨 ZEIGT SPIELE AN (MIT FILTERN)
 function renderMatches() {
     const container = document.getElementById("matches-container");
-    if (!container) return;
-    
+    if(!container) return;
+    const filterSelect = document.getElementById("stage-filter");
+    const filterValue = filterSelect ? filterSelect.value : "ALL";
     container.innerHTML = "";
 
-    const filterVal = document.getElementById("filter-phase") ? document.getElementById("filter-phase").value : "all";
-    let angezeigteSpiele = 0;
+    const filteredMatches = matches.filter(m => filterValue === "ALL" || m.filterCategory === filterValue);
 
-    matches.forEach(m => {
-        if (filterVal !== "all" && m.phase !== filterVal) return;
-        angezeigteSpiele++;
+    filteredMatches.forEach(match => {
+        const myExistingTip = serverTips.find(t => t.user === currentUser && t.pin === currentPin && t.matchId === match.id);
+        const matchResult = serverResults[match.id];
 
-        const serverResult = serverResults[m.id] || "-:-";
+        let valHome = myExistingTip ? myExistingTip.homeGoals : "";
+        let valAway = myExistingTip ? myExistingTip.awayGoals : "";
         
-        let meinTipp = "";
-        if (currentUser) {
-            const gefunden = serverTips.find(t => t.user_name === currentUser && t.match_id === m.id);
-            if (gefunden) meinTipp = gefunden.score;
+        if (isAdmin && matchResult) {
+            valHome = matchResult.home;
+            valAway = matchResult.away;
         }
 
-        let tplHome = "";
-        let tplAway = "";
-        if (meinTipp) {
-            const parts = meinTipp.split(":");
-            tplHome = parts[0];
-            tplAway = parts[1];
+        const allTipsForThisMatch = serverTips.filter(t => t.matchId === match.id);
+        let everybodyTipsHTML = "";
+
+        if (allTipsForThisMatch.length > 0) {
+            everybodyTipsHTML = `<div class="all-users-tips" style="margin-top: 12px; padding-top: 10px; border-top: 1px dotted #cbd5e0; font-size: 0.85rem; color: #4a5568;">`;
+            everybodyTipsHTML += `<strong style="display:block; margin-bottom:5px; color:#718096;">💡 Tipps der anderen Teilnehmer:</strong>`;
+            
+            allTipsForThisMatch.forEach(t => {
+                let pointsInfo = "";
+                if (matchResult) {
+                    const p = calculatePoints(t.homeGoals, t.awayGoals, matchResult.home, matchResult.away);
+                    pointsInfo = ` (+${p} Pkt.)`;
+                }
+                everybodyTipsHTML += `<span style="background: #edf2f7; padding: 4px 8px; border-radius: 4px; margin-right: 6px; margin-bottom: 6px; display: inline-block; border: 1px solid #e2e8f0;">👤 ${t.user}: <strong>${t.score}</strong>${pointsInfo}</span>`;
+            });
+            everybodyTipsHTML += `</div>`;
+        } else {
+            everybodyTipsHTML = `<div style="margin-top: 8px; font-size: 0.8rem; color: #a0aec0; font-style: italic;">Noch keine Tipps von anderen vorhanden.</div>`;
         }
 
-        const andereTipps = serverTips.filter(t => t.match_id === m.id && t.user_name !== currentUser);
-        let andereHTML = "";
-        if (andereTipps.length > 0) {
-            andereHTML = `<div class="other-tips">💡 Tipps: ` + 
-                andereTipps.map(t => `<span>👤 ${t.user_name}: ${t.score}</span>`).join(" ") + 
-                `</div>`;
-        }
-
-        const card = document.createElement("div");
-        card.className = "match-card";
-        card.innerHTML = `
-            <div class="match-meta">Spiel ${m.id} - 📅 ${m.date} um ${m.time} Uhr (${m.phase})</div>
-            <div class="match-main">
-                <span class="team-name">${m.h}</span>
-                <input type="number" id="home-tip-${m.id}" value="${tplHome}" placeholder="0" min="0">
-                <span class="vs">:</span>
-                <input type="number" id="away-tip-${m.id}" value="${tplAway}" placeholder="0" min="0">
-                <span class="team-name">${m.a}</span>
-                <button class="btn-tippen" onclick="submitTip(${m.id})">Tippen</button>
-            </div>
-            <div class="result-display">Echtes Ergebnis: <strong>${serverResult}</strong></div>
-            ${andereHTML}
-        `;
-
+        let buttonHTML = `<button onclick="saveTip(${match.id}, '${match.home} - ${match.away}', '${match.phase}')" style="background:#48bb78; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer;">Tippen</button>`;
         if (isAdmin) {
-            const adminDiv = document.createElement("div");
-            adminDiv.className = "admin-box";
-            adminDiv.innerHTML = `
-                ⚙️ Admin: 
-                <input type="number" id="home-res-${m.id}" placeholder="0" style="width:40px;"> : 
-                <input type="number" id="away-res-${m.id}" placeholder="0" style="width:40px;">
-                <button onclick="submitResult(${m.id})">Setzen</button>
-            `;
-            card.appendChild(adminDiv);
+            buttonHTML = `<button onclick="saveRealResult(${match.id})" style="background:#e53e3e; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer;">Ergebnis setzen</button>`;
         }
 
-        container.appendChild(card);
-    });
+        let infoErgebnisText = "";
+        if (matchResult) {
+            let punkteUserText = "";
+            if (myExistingTip && !isAdmin) {
+                const p = calculatePoints(myExistingTip.homeGoals, myExistingTip.awayGoals, matchResult.home, matchResult.away);
+                punkteUserText = ` | Deine Punkte: <strong style="color:#2b6cb0;">+${p}</strong>`;
+            }
+            infoErgebnisText = `<br><span style="color:#e53e3e;font-weight:bold;">Echtes Ergebnis: ${matchResult.home}:${matchResult.away}</span>${punkteUserText}`;
+        }
 
-    if (angezeigteSpiele === 0) {
-        container.innerHTML = `<div style="text-align:center; padding: 20px; color: #888;">
-            Für die Auswahl "${filterVal}" sind aktuell keine Spiele eingetragen. <br>
-            Stelle den Filter oben auf <strong>"Alle Spiele"</strong>!
-        </div>`;
+        container.innerHTML += `
+            <div class="match-card" style="background:white; padding:15px; border-radius:8px; margin-bottom:15px; box-shadow:0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
+                <div class="match-info" style="margin-bottom:10px;">
+                    <strong>Spiel ${match.id}</strong> - <span style="color:#3182ce;">📅 ${match.date} um ${match.time} Uhr</span> | <span style="font-style:italic;">${match.phase}</span>
+                    ${infoErgebnisText}
+                </div>
+                <div class="match-tipping-row" style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                    <span style="font-weight:500; min-width:120px; text-align:right;">${match.home}</span>
+                    <input type="number" id="home-tip-${match.id}" value="${valHome}" placeholder="0" min="0" style="width:50px; text-align:center; padding:5px; border-radius:4px; border:1px solid #cbd5e0;">
+                    <span>:</span>
+                    <input type="number" id="away-tip-${match.id}" value="${valAway}" placeholder="0" min="0" style="width:50px; text-align:center; padding:5px; border-radius:4px; border:1px solid #cbd5e0;">
+                    <span style="font-weight:500; min-width:120px; text-align:left;">${match.away}</span>
+                    ${buttonHTML}
+                </div>
+                ${everybodyTipsHTML}
+            </div>
+        `;
+    });
+}
+
+// 📅 ZEIGT DIE STRUKTURIERTEN WM-GRUPPEN AN
+function renderGruppen() {
+    const container = document.getElementById("gruppen-container");
+    if (!container) return;
+    container.innerHTML = "";
+
+    for (const [gruppe, teams] of Object.entries(gruppenDaten)) {
+        let teamsHTML = teams.map((team, index) => `<div style="padding:5px 0; border-bottom:${index < 3 ? '1px solid #edf2f7':'none'};">${index + 1}. ${team}</div>`).join("");
+        container.innerHTML += `
+            <div style="background:white; padding:15px; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.05); border:1px solid #e2e8f0;">
+                <h4 style="margin-top:0; color:#2b6cb0; border-bottom:2px solid #3182ce; padding-bottom:5px;">${gruppe}</h4>
+                ${teamsHTML}
+            </div>
+        `;
     }
 }
 
-// 🚀 START
+// 🏆 RANKING-BERECHNUNG & HIGHLIGHTS
+function renderLeaderboard() {
+    const leaderboardTab = document.getElementById("tab-tippspielrangliste");
+    if (!leaderboardTab) return;
+
+    const userPoints = {};
+    const userStats = {};
+
+    serverTips.forEach(tip => {
+        const res = serverResults[tip.matchId];
+        if (!userPoints[tip.user]) {
+            userPoints[tip.user] = 0;
+            userStats[tip.user] = { exact: 0, diff: 0, tendency: 0, total: 0 };
+        }
+        if (res) {
+            const pts = calculatePoints(tip.homeGoals, tip.awayGoals, res.home, res.away);
+            userPoints[tip.user] += pts;
+            userStats[tip.user].total++;
+            if (pts === 4) userStats[tip.user].exact++;
+            else if (pts === 2) userStats[tip.user].diff++;
+            else if (pts === 1) userStats[tip.user].tendency++;
+        }
+    });
+
+    // Auch User anzeigen, die sich registriert, aber noch keine Punkte haben
+    Object.keys(serverBonusTips).forEach(user => {
+        if (!userPoints[user]) {
+            userPoints[user] = 0;
+            userStats[user] = { exact: 0, diff: 0, tendency: 0, total: 0 };
+        }
+    });
+
+    const sortedUsers = Object.keys(userPoints).sort((a, b) => userPoints[b] - userPoints[a]);
+
+    let tableRows = sortedUsers.map((user, index) => {
+        const stats = userStats[user];
+        const bonus = serverBonusTips[user] || { wm: "Kein Tipp", scorer: "Kein Tipp" };
+        const isMe = user === currentUser ? "background:#ebf8ff; font-weight:bold;" : "";
+        let medal = `${index + 1}.`;
+        if (index === 0) medal = "🥇";
+        if (index === 1) medal = "🥈";
+        if (index === 2) medal = "🥉";
+
+        return `
+            <tr style="${isMe}">
+                <td style="padding:10px; text-align:center;">${medal}</td>
+                <td style="padding:10px;">${user}</td>
+                <td style="padding:10px; text-align:center; color:#2b6cb0;"><strong>${userPoints[user]} Pkt.</strong></td>
+                <td style="padding:10px; text-align:center; font-size:0.85rem; color:#718096;">
+                    ${stats.exact}x (4P) / ${stats.diff}x (2P) / ${stats.tendency}x (1P)
+                </td>
+                <td style="padding:10px; font-size:0.8rem; color:#4a5568;">
+                    🏆 ${bonus.wm} <br> 👟 ${bonus.scorer}
+                </td>
+            </tr>
+        `;
+    }).join("");
+
+    leaderboardTab.innerHTML = `
+        <h3>🏆 Aktuelle Tippspielrangliste</h3>
+        <table style="width:100%; border-collapse:collapse; margin-top:15px;">
+            <thead>
+                <tr style="background:#edf2f7; text-align:left;">
+                    <th style="padding:10px; text-align:center; width:60px;">Platz</th>
+                    <th style="padding:10px;">Spieler</th>
+                    <th style="padding:10px; text-align:center;">Punkte</th>
+                    <th style="padding:10px; text-align:center;">Tipp-Statistik</th>
+                    <th style="padding:10px;">Zusatztipps (WM / Torjäger)</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${tableRows || '<tr><td colspan="5" style="padding:15px; text-align:center; color:#a0aec0;">Noch keine Berechnungen verfügbar.</td></tr>'}
+            </tbody>
+        </table>
+    `;
+}
+
+// 📊 COMPACT TAB FÜR AMTLICHE ENDERGEBNISSE
+function renderWMResultsTab() {
+    const tbody = document.getElementById("wm-results-body");
+    if (!tbody) return;
+    tbody.innerHTML = "";
+
+    let hasResults = false;
+    matches.forEach(match => {
+        const res = serverResults[match.id];
+        if (res) {
+            hasResults = true;
+            tbody.innerHTML += `
+                <tr>
+                    <td style="padding:8px; border-bottom:1px solid #edf2f7;">Spiel ${match.id}</td>
+                    <td style="padding:8px; border-bottom:1px solid #edf2f7; font-size:0.85rem; color:#718096;">${match.date} - ${match.time}</td>
+                    <td style="padding:8px; border-bottom:1px solid #edf2f7;"><strong>${match.home} vs. ${match.away}</strong></td>
+                    <td style="padding:8px; border-bottom:1px solid #edf2f7; color:#e53e3e; font-weight:bold; font-size:1.1rem;">${res.home}:${res.away}</td>
+                </tr>
+            `;
+        }
+    });
+
+    if (!hasResults) {
+        tbody.innerHTML = `<tr><td colspan="4" style="padding:20px; text-align:center; color:#a0aec0; font-style:italic;">Es wurden noch keine offiziellen WM-Ergebnisse eingetragen.</td></tr>`;
+    }
+}
+
+// 🚀 APPLIKATIONSSTART
 window.addEventListener("DOMContentLoaded", async () => {
-    buildMatches();
+    generate104Matches();
+    buildKachelnAndTabs();
     updateWelcomeMessage();
     await fetchServerData();
-    renderMatches();
-
-    const registerBtn = document.getElementById("btn-register");
-    if(registerBtn) registerBtn.addEventListener("click", registerUser);
-    
-    const filterSelect = document.getElementById("filter-phase");
-    if(filterSelect) filterSelect.addEventListener("change", renderMatches);
+    switchTab("tippen");
 });

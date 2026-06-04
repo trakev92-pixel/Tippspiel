@@ -57,8 +57,7 @@ async function saveToSupabase(table, body, method = "POST", rowId = null) {
     const headers = {
         "apikey": SUPABASE_KEY,
         "Authorization": `Bearer ${SUPABASE_KEY}`,
-        "Content-Type": "application/json",
-        "Prefer": "return=minimal"
+        "Content-Type": "application/json"
     };
 
     try {
@@ -75,7 +74,6 @@ async function saveToSupabase(table, body, method = "POST", rowId = null) {
     }
 }
 
-// 📅 GENERIERUNG ALLER 104 SPIELE
 function generate104Matches() {
     const gruppenMatches = [
         { phase: "Gruppe A", cat: "Gruppe A-D", date: "11.06.2026", time: "21:00", h: "Mexiko 🇲🇽", a: "Südafrika 🇿🇦" },
@@ -84,7 +82,7 @@ function generate104Matches() {
         { phase: "Gruppe D", cat: "Gruppe A-D", date: "13.06.2026", time: "03:00", h: "USA 🇺🇸", a: "Paraguay 🇵🇾" },
         { phase: "Gruppe B", cat: "Gruppe A-D", date: "13.06.2026", time: "21:00", h: "Katar 🇶🇦", a: "Schweiz 🇨🇭" },
         { phase: "Gruppe C", cat: "Gruppe A-D", date: "14.06.2026", time: "00:00", h: "Brasilien 🇧🇷", a: "Marokko 🇲🇦" },
-        { phase: "Gruppe C", cat: "Gruppe A-D", date: "14.06.2026", time: "03:00", h: "Haiti 🇭🇹", a: "Schottland 🏴󠁧󠁢󠁳󠁣󠁴󠁿" },
+        { phase: "Gruppe C", cat: "Gruppe A-D", date: "14.06.2026", time: "03:00", h: "Haiti 🇭🇹", a: "Schottland 🏴󠁧󠁢󠁣󠁴󠁿" },
         { phase: "Gruppe D", cat: "Gruppe A-D", date: "14.06.2026", time: "06:00", h: "Australien 🇦🇺", a: "Türkei 🇹🇷" },
         { phase: "Gruppe E", cat: "Gruppe E-H", date: "14.06.2026", time: "19:00", h: "Deutschland 🇩🇪", a: "Curaçao 🇨🇼" },
         { phase: "Gruppe F", cat: "Gruppe E-H", date: "14.06.2026", time: "22:00", h: "Niederlande 🇳🇱", a: "Japan 🇯🇵" },
@@ -107,7 +105,7 @@ function generate104Matches() {
         { phase: "Gruppe B", cat: "Gruppe A-D", date: "19.06.2026", time: "00:00", h: "Kanada 🇨🇦", a: "Katar 🇶🇦" },
         { phase: "Gruppe A", cat: "Gruppe A-D", date: "19.06.2026", time: "03:00", h: "Mexiko 🇲🇽", a: "Südkorea 🇰🇷" },
         { phase: "Gruppe D", cat: "Gruppe A-D", date: "19.06.2026", time: "21:00", h: "USA 🇺🇸", a: "Australien 🇦🇺" },
-        { phase: "Gruppe C", cat: "Gruppe A-D", date: "20.06.2026", time: "00:00", h: "Schottland 🏴󠁧󠁢󠁳󠁣󠁴󠁿", a: "Marokko 🇲🇦" },
+        { phase: "Gruppe C", cat: "Gruppe A-D", date: "20.06.2026", time: "00:00", h: "Schottland 🏴󠁧󠁢󠁣󠁴󠁿", a: "Marokko 🇲🇦" },
         { phase: "Gruppe C", cat: "Gruppe A-D", date: "20.06.2026", time: "03:00", h: "Brasilien 🇧🇷", a: "Haiti 🇭🇹" },
         { phase: "Gruppe D", cat: "Gruppe A-D", date: "20.06.2026", time: "06:00", h: "Türkei 🇹🇷", a: "Paraguay 🇵🇾" },
         { phase: "Gruppe F", cat: "Gruppe E-H", date: "20.06.2026", time: "19:00", h: "Niederlande 🇳🇱", a: "Japan 🇯🇵" },
@@ -128,7 +126,7 @@ function generate104Matches() {
         { phase: "Gruppe K", cat: "Gruppe I-L", date: "24.06.2026", time: "04:00", h: "Kolumbien 🇨🇴", a: "DR Kongo 🇨🇩" },
         { phase: "Gruppe B", cat: "Gruppe A-D", date: "24.06.2026", time: "21:00", h: "Schweiz 🇨🇭", a: "Kanada 🇨🇦" },
         { phase: "Gruppe B", cat: "Gruppe A-D", date: "24.06.2026", time: "21:00", h: "Bosnien-Herzegowina 🇧🇦", a: "Katar 🇶🇦" },
-        { phase: "Gruppe C", cat: "Gruppe A-D", date: "25.06.2026", time: "00:00", h: "Schottland 🏴󠁧󠁢󠁳󠁣󠁴󠁿", a: "Brasilien 🇧🇷" },
+        { phase: "Gruppe C", cat: "Gruppe A-D", date: "25.06.2026", time: "00:00", h: "Schottland 🏴󠁧󠁢󠁣託󠁿", a: "Brasilien 🇧🇷" },
         { phase: "Gruppe C", cat: "Gruppe A-D", date: "25.06.2026", time: "00:00", h: "Marokko 🇲🇦", a: "Haiti 🇭🇹" },
         { phase: "Gruppe A", cat: "Gruppe A-D", date: "25.06.2026", time: "03:00", h: "Tschechien 🇨🇿", a: "Mexiko 🇲🇽" },
         { phase: "Gruppe A", cat: "Gruppe A-D", date: "25.06.2026", time: "03:00", h: "Südafrika 🇿🇦", a: "Südkorea 🇰🇷" },
@@ -203,21 +201,19 @@ function generate104Matches() {
     });
 }
 
-// 📊 UPDATET LOKALE VARIABLEN AUS SERVER-DATENSÄTZEN
 async function fetchServerData() {
     const tipsData = await getFromSupabase("wm_tips");
     const resultsData = await getFromSupabase("wm_results");
     const bonusData = await getFromSupabase("wm_bonus_tips");
 
     serverTips = tipsData.map(t => ({
-        id: t.id, // ID wird für gezielte Updates (PATCH) gebraucht
         user: t.user_name, pin: t.pin, matchId: t.match_id, matchTeams: t.match_teams,
         phase: t.phase, score: t.score, homeGoals: t.home_goals, awayGoals: t.away_goals
     }));
 
     serverResults = {};
     resultsData.forEach(r => {
-        serverResults[r.match_id] = { id: r.id, home: r.home_goals, away: r.away_goals };
+        serverResults[r.match_id] = { home: r.home_goals, away: r.away_goals };
     });
 
     serverBonusTips = {};
@@ -226,7 +222,6 @@ async function fetchServerData() {
     });
 }
 
-// 📑 ERSTELLT DIE STRUKTUR UND TABS
 function buildKachelnAndTabs() {
     let kachelLeiste = document.querySelector(".kachel-leiste");
     if (!kachelLeiste) return;
@@ -274,6 +269,7 @@ function buildKachelnAndTabs() {
                         <input type="text" id="username" placeholder="Name" style="flex:2; padding:8px; border-radius:4px; border:1px solid #cbd5e0;">
                         <input type="password" id="userpin" placeholder="4-stg. PIN" maxlength="4" style="flex:1; padding:8px; border-radius:4px; border:1px solid #cbd5e0; text-align:center;">
                     </div>
+                    
                     <div style="display:flex; gap:10px;">
                         <div style="flex:1;">
                             <label style="font-size:0.75rem; font-weight:bold; color:#718096; display:block;">🔮 Weltmeister-Tipp:</label>
@@ -284,13 +280,14 @@ function buildKachelnAndTabs() {
                             <input type="text" id="bonus-scorer" placeholder="z.B. Mbappé" style="padding:6px; width:100%; box-sizing:border-box; border-radius:4px; border:1px solid #cbd5e0; font-size:0.85rem;">
                         </div>
                     </div>
+                    
                     <button onclick="registerUser()" style="background:#3182ce; color:white; font-weight:bold; padding:8px; border:none; border-radius:4px; cursor:pointer;">Speichern & Anmelden</button>
                 </div>
             </div>
         </div>
-        <div class="filter-box" style="margin: 15px 0; padding: 10px; background:#edf2f7; border-radius:8px;">
+        <div class="filter-box">
             <label style="font-weight:bold; margin-right:10px;">Phase filtern:</label>
-            <select id="stage-filter" onchange="renderMatches()" style="padding:6px; border-radius:4px;">
+            <select id="stage-filter" onchange="renderMatches()">
                 <option value="ALL">Alle Spiele anzeigen</option>
                 <option value="Gruppe A-D">Gruppen A - D</option>
                 <option value="Gruppe E-H">Gruppen E - H</option>
@@ -302,7 +299,6 @@ function buildKachelnAndTabs() {
     `;
 }
 
-// 🔄 SCHALTET ZWISCHEN TABS UM
 async function switchTab(tabName) {
     document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
     document.querySelectorAll('.kachel').forEach(el => {
@@ -332,7 +328,6 @@ async function switchTab(tabName) {
     }
 }
 
-// 👤 ANMELDUNG & REGISTRIERUNG
 async function registerUser() {
     const nameInput = document.getElementById("username").value.trim();
     const pinInput = document.getElementById("userpin").value.trim();
@@ -356,6 +351,7 @@ async function registerUser() {
 
     if(pinInput.length < 4) { alert("Bitte eine 4-stellige PIN ausdenken/eingeben!"); return; }
 
+    // Checken, ob dieser Name existiert und ob die PIN stimmt
     const checkUrl = `${SUPABASE_URL}/rest/v1/wm_bonus_tips?user_name=eq.${encodeURIComponent(nameInput)}`;
     let existingRowId = null;
 
@@ -367,6 +363,7 @@ async function registerUser() {
         const checkData = await checkRes.json();
         
         if (checkData && checkData.length > 0) {
+            // Name existiert! Stimmt die PIN?
             if (checkData[0].pin !== pinInput) {
                 alert(`Der Name '${nameInput}' ist bereits geschützt. Falsche PIN! Falls du ein anderer '${nameInput}' bist, hänge ein Kürzel an deinen Namen (z.B. ${nameInput}2).`);
                 return;
@@ -453,7 +450,6 @@ function logoutAdmin() {
     switchTab("tippen");
 }
 
-// 🧮 PUNKTEBERECHNUNG: Exakt = 4, Tendenz = 2, Falsche Tendenz aber ein richtiges Tor = 1, Sonst = 0
 function calculatePoints(tHome, tAway, rHome, rAway) {
     const th = parseInt(tHome);
     const ta = parseInt(tAway);
@@ -462,12 +458,7 @@ function calculatePoints(tHome, tAway, rHome, rAway) {
 
     if (isNaN(th) || isNaN(ta) || isNaN(rh) || isNaN(ra)) return 0;
     if (th === rh && ta === ra) return 4;
-    if (th === rh || ta === ra) {
-        const tippTendenz = th > ta ? 1 : (th < ta ? -1 : 0);
-        const realTendenz = rh > ra ? 1 : (rh < ra ? -1 : 0);
-        if (tippTendenz === realTendenz) return 2;
-        return 1;
-    }
+    if (th === ra && ta === rh) return 1;
 
     const tippTendenz = th > ta ? 1 : (th < ta ? -1 : 0);
     const realTendenz = rh > ra ? 1 : (rh < ra ? -1 : 0);
@@ -476,95 +467,16 @@ function calculatePoints(tHome, tAway, rHome, rAway) {
     return 0; 
 }
 
-// ⚽ SPEICHERT ODER UPDATET EINEN TIPPSPIEL-EINTRAG
-async function saveTip(matchId, matchTeams, phase) {
-    if (!currentUser || currentUser === "Admin⚙️") {
-        alert("Bitte melde dich zuerst als Tipper an!");
-        return;
-    }
-
-    const homeInput = document.getElementById(`home-tip-${matchId}`).value;
-    const awayInput = document.getElementById(`away-tip-${matchId}`).value;
-
-    if (homeInput === "" || awayInput === "") {
-        alert("Bitte trage beide Felder für das Ergebnis ein!");
-        return;
-    }
-
-    const scoreString = `${homeInput}:${awayInput}`;
-    
-    // Prüfen, ob für diesen User + PIN bereits ein Tipp für dieses Spiel existiert
-    const existingTip = serverTips.find(t => t.user === currentUser && t.pin === currentPin && t.matchId === matchId);
-
-    const saveData = {
-        user_name: currentUser,
-        pin: currentPin,
-        match_id: matchId,
-        match_teams: matchTeams,
-        phase: phase,
-        score: scoreString,
-        home_goals: parseInt(homeInput),
-        away_goals: parseInt(awayInput)
-    };
-
-    let success = false;
-    if (existingTip && existingTip.id) {
-        success = await saveToSupabase("wm_tips", saveData, "PATCH", existingTip.id);
-    } else {
-        success = await saveToSupabase("wm_tips", saveData, "POST");
-    }
-
-    if (success) {
-        alert("Tipp erfolgreich abgegeben!");
-        await fetchServerData();
-        renderMatches();
-    }
-}
-
-// ⚙️ ADMIN SETZT DAS ECHTE SPIELERGEBNIS
-async function saveRealResult(matchId) {
-    if (!isAdmin) return;
-
-    const homeRes = document.getElementById(`home-tip-${matchId}`).value;
-    const awayRes = document.getElementById(`away-tip-${matchId}`).value;
-
-    if (homeRes === "" || awayRes === "") {
-        alert("Bitte beide Felder ausfüllen!");
-        return;
-    }
-
-    const existingResult = serverResults[matchId];
-    const saveData = {
-        match_id: matchId,
-        home_goals: parseInt(homeRes),
-        away_goals: parseInt(awayRes)
-    };
-
-    let success = false;
-    if (existingResult && existingResult.id) {
-        success = await saveToSupabase("wm_results", saveData, "PATCH", existingResult.id);
-    } else {
-        success = await saveToSupabase("wm_results", saveData, "POST");
-    }
-
-    if (success) {
-        alert("Offizielles Ergebnis eingetragen!");
-        await fetchServerData();
-        renderMatches();
-    }
-}
-
-// 🎨 ZEIGT SPIELE AN (MIT FILTERN)
 function renderMatches() {
     const container = document.getElementById("matches-container");
     if(!container) return;
-    const filterSelect = document.getElementById("stage-filter");
-    const filterValue = filterSelect ? filterSelect.value : "ALL";
+    const filterValue = document.getElementById("stage-filter").value;
     container.innerHTML = "";
 
     const filteredMatches = matches.filter(m => filterValue === "ALL" || m.filterCategory === filterValue);
 
     filteredMatches.forEach(match => {
+        // Findet den eigenen Tipp passend zu User UND PIN
         const myExistingTip = serverTips.find(t => t.user === currentUser && t.pin === currentPin && t.matchId === match.id);
         const matchResult = serverResults[match.id];
 
@@ -576,6 +488,7 @@ function renderMatches() {
             valAway = matchResult.away;
         }
 
+        // Listet ALLE abgegebenen Tipps für dieses Spiel auf
         const allTipsForThisMatch = serverTips.filter(t => t.matchId === match.id);
         let everybodyTipsHTML = "";
 
@@ -591,6 +504,7 @@ function renderMatches() {
                 }
                 everybodyTipsHTML += `<span style="background: #edf2f7; padding: 4px 8px; border-radius: 4px; margin-right: 6px; margin-bottom: 6px; display: inline-block; border: 1px solid #e2e8f0;">👤 ${t.user}: <strong>${t.score}</strong>${pointsInfo}</span>`;
             });
+            
             everybodyTipsHTML += `</div>`;
         } else {
             everybodyTipsHTML = `<div style="margin-top: 8px; font-size: 0.8rem; color: #a0aec0; font-style: italic;">Noch keine Tipps von anderen vorhanden.</div>`;
@@ -608,155 +522,250 @@ function renderMatches() {
                 const p = calculatePoints(myExistingTip.homeGoals, myExistingTip.awayGoals, matchResult.home, matchResult.away);
                 punkteUserText = ` | Deine Punkte: <strong style="color:#2b6cb0;">+${p}</strong>`;
             }
-            infoErgebnisText = `<br><span style="color:#e53e3e;font-weight:bold;">Echtes Ergebnis: ${matchResult.home}:${matchResult.away}</span>${punkteUserText}`;
+            infoErgebnisText = `<br><span style="color:#e53e3e;font-weight:bold;">Ergebnis: ${matchResult.home}:${matchResult.away}</span>${punkteUserText}`;
         }
 
         container.innerHTML += `
-            <div class="match-card" style="background:white; padding:15px; border-radius:8px; margin-bottom:15px; box-shadow:0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
-                <div class="match-info" style="margin-bottom:10px;">
-                    <strong>Spiel ${match.id}</strong> - <span style="color:#3182ce;">📅 ${match.date} um ${match.time} Uhr</span> | <span style="font-style:italic;">${match.phase}</span>
+            <div class="match-card" style="background:white; padding:15px; border-radius:8px; margin-bottom:15px; box-shadow:0 2px 4px rgba(0,0,0,0.05);">
+                <div class="match-info">
+                    <strong>Spiel ${match.id}</strong> - <span style="color:#3182ce;">📅 ${match.date} um ${match.time} Uhr</span><br>
+                    <small>${match.phase}</small>
                     ${infoErgebnisText}
                 </div>
-                <div class="match-tipping-row" style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-                    <span style="font-weight:500; min-width:120px; text-align:right;">${match.home}</span>
-                    <input type="number" id="home-tip-${match.id}" value="${valHome}" placeholder="0" min="0" style="width:50px; text-align:center; padding:5px; border-radius:4px; border:1px solid #cbd5e0;">
-                    <span>:</span>
-                    <input type="number" id="away-tip-${match.id}" value="${valAway}" placeholder="0" min="0" style="width:50px; text-align:center; padding:5px; border-radius:4px; border:1px solid #cbd5e0;">
-                    <span style="font-weight:500; min-width:120px; text-align:left;">${match.away}</span>
-                    ${buttonHTML}
+
+                <div class="poster-row tipp-zeile" style="display:flex; align-items:center; gap:10px; margin: 10px 0;">
+                    <span class="poster-label" style="font-weight:bold; color:#718096; width:75px;">Dein Tipp:</span>
+                    <span class="team-home">${match.home}</span>
+                    <input type="number" class="tipp-box" id="home-${match.id}" min="0" placeholder="0" value="${valHome}" style="width:50px; text-align:center; padding:6px;">
+                    <span class="trenner">:</span>
+                    <input type="number" class="tipp-box" id="away-${match.id}" min="0" placeholder="0" value="${valAway}" style="width:50px; text-align:center; padding:6px;">
+                    <span class="team-away">${match.away}</span>
                 </div>
+
+                <div class="action-buttons" style="margin-top:10px;">${buttonHTML}</div>
+                
                 ${everybodyTipsHTML}
             </div>
         `;
     });
 }
 
-// 📅 ZEIGT DIE STRUKTURIERTEN WM-GRUPPEN AN
+async function saveTip(matchId, matchTeams, phase) {
+    if(!currentUser || isAdmin) { alert("Bitte melde dich zuerst als Tipper an!"); return; }
+    const homeGoals = document.getElementById(`home-${matchId}`).value;
+    const awayGoals = document.getElementById(`away-${matchId}`).value;
+
+    if(homeGoals === "" || awayGoals === "") { alert("Bitte Tore eintragen!"); return; }
+
+    // Sucht genau nach der Zeile, die zu DIESEM User mit DIESER PIN und DIESEM Spiel gehört
+    const checkUrl = `${SUPABASE_URL}/rest/v1/wm_tips?user_name=eq.${encodeURIComponent(currentUser)}&pin=eq.${encodeURIComponent(currentPin)}&match_id=eq.${matchId}`;
+    let existingId = null;
+
+    try {
+        const checkRes = await fetch(checkUrl, {
+            method: "GET",
+            headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
+        });
+        const checkData = await checkRes.json();
+        if (checkData && checkData.length > 0) {
+            existingId = checkData[0].id; // Eindeutige ID zum Überschreiben gefunden
+        }
+    } catch(err) {
+        console.error("Fehler beim Suchen des alten Tipps:", err);
+    }
+
+    const tipData = {
+        user_name: currentUser, 
+        pin: currentPin, // Die PIN wird mitgespeichert
+        match_id: matchId, 
+        match_teams: matchTeams, 
+        phase: phase,
+        score: homeGoals + " : " + awayGoals, 
+        home_goals: parseInt(homeGoals), 
+        away_goals: parseInt(awayGoals)
+    };
+
+    let success = false;
+    if (existingId) {
+        // Bestehenden Tipp updaten via PATCH
+        success = await saveToSupabase("wm_tips", tipData, "PATCH", existingId);
+    } else {
+        // Neuen Tipp anlegen via POST
+        success = await saveToSupabase("wm_tips", tipData, "POST");
+    }
+
+    if (success) {
+        alert("Tipp erfolgreich gespeichert!");
+        await fetchServerData();
+        renderMatches();
+    }
+}
+
+async function saveRealResult(matchId) {
+    const homeGoals = document.getElementById(`home-${matchId}`).value;
+    const awayGoals = document.getElementById(`away-${matchId}`).value;
+
+    if(homeGoals === "" || awayGoals === "") { alert("Bitte Tore eintragen!"); return; }
+
+    const success = await saveToSupabase("wm_results", {
+        match_id: matchId, home_goals: parseInt(homeGoals), away_goals: parseInt(awayGoals)
+    });
+    
+    if (success) {
+        await fetchServerData();
+        renderMatches();
+    }
+}
+
 function renderGruppen() {
     const container = document.getElementById("gruppen-container");
-    if (!container) return;
+    if(!container) return;
     container.innerHTML = "";
-
-    for (const [gruppe, teams] of Object.entries(gruppenDaten)) {
-        let teamsHTML = teams.map((team, index) => `<div style="padding:5px 0; border-bottom:${index < 3 ? '1px solid #edf2f7':'none'};">${index + 1}. ${team}</div>`).join("");
+    
+    for (let gruppe in gruppenDaten) {
+        let teamsHTML = "";
+        gruppenDaten[gruppe].forEach(team => {
+            teamsHTML += `<div style="padding:5px 0; border-bottom: 1px dashed #edf2f7;">${team}</div>`;
+        });
+        
         container.innerHTML += `
-            <div style="background:white; padding:15px; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.05); border:1px solid #e2e8f0;">
-                <h4 style="margin-top:0; color:#2b6cb0; border-bottom:2px solid #3182ce; padding-bottom:5px;">${gruppe}</h4>
+            <div class="gruppe-card">
+                <h4>${gruppe}</h4>
                 ${teamsHTML}
             </div>
         `;
     }
 }
 
-// 🏆 RANKING-BERECHNUNG & HIGHLIGHTS
 function renderLeaderboard() {
-    const leaderboardTab = document.getElementById("tab-tippspielrangliste");
-    if (!leaderboardTab) return;
+    const mainTab = document.getElementById("tab-tippspielrangliste");
+    if(!mainTab) return;
 
     const userPoints = {};
-    const userStats = {};
+    if (currentUser && currentUser !== "Admin⚙️" && !userPoints[currentUser]) userPoints[currentUser] = 0;
+    
+    serverTips.forEach(t => { if(!userPoints[t.user]) userPoints[t.user] = 0; });
 
     serverTips.forEach(tip => {
-        const res = serverResults[tip.matchId];
-        if (!userPoints[tip.user]) {
-            userPoints[tip.user] = 0;
-            userStats[tip.user] = { exact: 0, diff: 0, tendency: 0, total: 0 };
-        }
-        if (res) {
-            const pts = calculatePoints(tip.homeGoals, tip.awayGoals, res.home, res.away);
-            userPoints[tip.user] += pts;
-            userStats[tip.user].total++;
-            if (pts === 4) userStats[tip.user].exact++;
-            else if (pts === 2) userStats[tip.user].diff++;
-            else if (pts === 1) userStats[tip.user].tendency++;
+        const result = serverResults[tip.matchId];
+        if (result) {
+            const p = calculatePoints(tip.homeGoals, tip.awayGoals, result.home, result.away);
+            userPoints[tip.user] += p;
         }
     });
 
-    // Auch User anzeigen, die sich registriert, aber noch keine Punkte haben
-    Object.keys(serverBonusTips).forEach(user => {
-        if (!userPoints[user]) {
-            userPoints[user] = 0;
-            userStats[user] = { exact: 0, diff: 0, tendency: 0, total: 0 };
-        }
-    });
+    const leaderboardArray = [];
+    for (let user in userPoints) {
+        leaderboardArray.push({ name: user, points: userPoints[user] });
+    }
+    leaderboardArray.sort((a, b) => b.points - a.points);
 
-    const sortedUsers = Object.keys(userPoints).sort((a, b) => userPoints[b] - userPoints[a]);
+    let rankingHTML = `
+        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 25px; border:1px solid #e2e8f0;">
+            <h4 style="margin-top: 0; margin-bottom: 15px; color:#2d3748; font-size:1.2rem;">🏆 Aktuelles Live-Ranking</h4>
+            <table>
+                <thead>
+                    <tr><th>Platz</th><th>Tipper Name</th><th style="text-align:right;">Gesamtpunkte</th></tr>
+                </thead>
+                <tbody>
+    `;
 
-    let tableRows = sortedUsers.map((user, index) => {
-        const stats = userStats[user];
-        const bonus = serverBonusTips[user] || { wm: "Kein Tipp", scorer: "Kein Tipp" };
-        const isMe = user === currentUser ? "background:#ebf8ff; font-weight:bold;" : "";
-        let medal = `${index + 1}.`;
-        if (index === 0) medal = "🥇";
-        if (index === 1) medal = "🥈";
-        if (index === 2) medal = "🥉";
-
-        return `
-            <tr style="${isMe}">
-                <td style="padding:10px; text-align:center;">${medal}</td>
-                <td style="padding:10px;">${user}</td>
-                <td style="padding:10px; text-align:center; color:#2b6cb0;"><strong>${userPoints[user]} Pkt.</strong></td>
-                <td style="padding:10px; text-align:center; font-size:0.85rem; color:#718096;">
-                    ${stats.exact}x (4P) / ${stats.diff}x (2P) / ${stats.tendency}x (1P)
-                </td>
-                <td style="padding:10px; font-size:0.8rem; color:#4a5568;">
-                    🏆 ${bonus.wm} <br> 👟 ${bonus.scorer}
-                </td>
-            </tr>
-        `;
-    }).join("");
-
-    leaderboardTab.innerHTML = `
-        <h3>🏆 Aktuelle Tippspielrangliste</h3>
-        <table style="width:100%; border-collapse:collapse; margin-top:15px;">
-            <thead>
-                <tr style="background:#edf2f7; text-align:left;">
-                    <th style="padding:10px; text-align:center; width:60px;">Platz</th>
-                    <th style="padding:10px;">Spieler</th>
-                    <th style="padding:10px; text-align:center;">Punkte</th>
-                    <th style="padding:10px; text-align:center;">Tipp-Statistik</th>
-                    <th style="padding:10px;">Zusatztipps (WM / Torjäger)</th>
+    if (leaderboardArray.length === 0) {
+        rankingHTML += `<tr><td colspan="3" style="text-align:center; color:#a0aec0; padding:15px;">Noch keine User registriert.</td></tr>`;
+    } else {
+        leaderboardArray.forEach((player, index) => {
+            const platzierung = index + 1;
+            let medaille = platzierung === 1 ? "🥇 " : (platzierung === 2 ? "🥈 " : (platzierung === 3 ? "🥉 " : ""));
+            rankingHTML += `
+                <tr style="${platzierung === 1 ? 'background:#fef3c7; font-weight:bold;' : ''}">
+                    <td><strong>#${platzierung}</strong></td>
+                    <td>${medaille}${player.name} ${player.name === currentUser ? '<span style="color:#718096; font-size:0.8rem;">(Du)</span>' : ''}</td>
+                    <td style="text-align:right;"><span style="background:#3182ce; color:white; padding:4px 12px; border-radius:12px; font-weight:bold;">${player.points} Pkt.</span></td>
                 </tr>
-            </thead>
-            <tbody>
-                ${tableRows || '<tr><td colspan="5" style="padding:15px; text-align:center; color:#a0aec0;">Noch keine Berechnungen verfügbar.</td></tr>'}
-            </tbody>
+            `;
+        });
+    }
+    rankingHTML += `</tbody></table></div>`;
+
+    let bonusHTML = `
+        <div style="background: #edf2f7; padding: 15px; border-radius: 8px; margin-bottom: 25px; border:1px solid #cbd5e0;">
+            <h4 style="margin-top: 0; margin-bottom: 10px; color:#2b6cb0;">🔮 Übersicht Bonus-Tipps</h4>
+            <table style="background:white;">
+                <thead>
+                    <tr style="background:#cbd5e0; color:#2d3748;"><th>👤 Tipper</th><th>🥇 Weltmeister-Tipp</th><th>⚽ Top-Torjäger-Tipp</th></tr>
+                </thead>
+                <tbody>
+    `;
+
+    let bonusRowsExist = false;
+    for(let user in serverBonusTips) {
+        bonusRowsExist = true;
+        bonusHTML += `<tr><td><strong>${user}</strong></td><td style="color:#2b6cb0;">🏆 ${serverBonusTips[user].wm}</td><td style="color:#4a5568;">👟 ${serverBonusTips[user].scorer}</td></tr>`;
+    }
+    if(!bonusRowsExist) {
+        bonusHTML += `<tr><td colspan="3" style="text-align:center; color:#a0aec0; padding:10px;">Noch keine Bonustipps abgegeben.</td></tr>`;
+    }
+    bonusHTML += `</tbody></table></div>`;
+
+    let protocolRows = "";
+    const sortedTips = [...serverTips].sort((a, b) => a.matchId - b.matchId);
+    sortedTips.forEach(tip => {
+        const result = serverResults[tip.matchId];
+        let pBadge = `<span style="background:#cbd5e0; padding:4px 8px; border-radius:4px; font-size:0.8rem;">Wartet...</span>`;
+        if(result) {
+            const p = calculatePoints(tip.homeGoals, tip.awayGoals, result.home, result.away);
+            pBadge = `<span style="background:#48bb78; color:white; padding:4px 8px; border-radius:4px; font-weight:bold;">+${p} Pkt.</span>`;
+        }
+        protocolRows += `<tr><td><strong>👤 ${tip.user}</strong></td><td><span style="background:#edd8ff; padding:2px 6px; border-radius:4px; font-size:0.85rem;">Spiel ${tip.matchId}</span></td><td>${tip.matchTeams}</td><td style="font-weight:bold;">${tip.score}</td><td style="text-align:right;">${pBadge}</td></tr>`;
+    });
+
+    if (protocolRows === "") {
+        protocolRows = '<tr><td colspan="5" style="text-align:center; color:#a0aec0; padding:15px;">Noch keine Tipps vorhanden.</td></tr>';
+    }
+
+    mainTab.innerHTML = `
+        <h2 style="color:#2d3748; margin-top:0;">🏆 Tippspielrangliste</h2>
+        ${rankingHTML}
+        ${bonusHTML}
+        <h4>📜 Alle abgegebenen Tipps</h4>
+        <table>
+            <thead><tr style="background:#e2e8f0;"><th>Tipper</th><th>Spiel</th><th>Begegnung</th><th>Tipp</th><th style="text-align:right;">Auswertung</th></tr></thead>
+            <tbody>${protocolRows}</tbody>
         </table>
     `;
 }
 
-// 📊 COMPACT TAB FÜR AMTLICHE ENDERGEBNISSE
 function renderWMResultsTab() {
     const tbody = document.getElementById("wm-results-body");
-    if (!tbody) return;
+    if(!tbody) return;
     tbody.innerHTML = "";
 
-    let hasResults = false;
     matches.forEach(match => {
         const res = serverResults[match.id];
-        if (res) {
-            hasResults = true;
-            tbody.innerHTML += `
-                <tr>
-                    <td style="padding:8px; border-bottom:1px solid #edf2f7;">Spiel ${match.id}</td>
-                    <td style="padding:8px; border-bottom:1px solid #edf2f7; font-size:0.85rem; color:#718096;">${match.date} - ${match.time}</td>
-                    <td style="padding:8px; border-bottom:1px solid #edf2f7;"><strong>${match.home} vs. ${match.away}</strong></td>
-                    <td style="padding:8px; border-bottom:1px solid #edf2f7; color:#e53e3e; font-weight:bold; font-size:1.1rem;">${res.home}:${res.away}</td>
-                </tr>
-            `;
-        }
-    });
+        const scoreText = res ? `${res.home} : ${res.away}` : "---";
+        const scoreStyle = res ? "background:#fed7d7; color:#c53030; font-weight:bold;" : "color:#a0aec0;";
 
-    if (!hasResults) {
-        tbody.innerHTML = `<tr><td colspan="4" style="padding:20px; text-align:center; color:#a0aec0; font-style:italic;">Es wurden noch keine offiziellen WM-Ergebnisse eingetragen.</td></tr>`;
-    }
+        tbody.innerHTML += `<tr><td><span style="background:#e2e8f0; padding:2px 6px; border-radius:4px;">Spiel ${match.id}</span></td><td><small>${match.date} - ${match.time} Uhr</small></td><td><strong>${match.home}</strong> vs. <strong>${match.away}</strong></td><td><span style="padding:4px 10px; border-radius:6px; ${scoreStyle}">${scoreText}</span></td></tr>`;
+    });
 }
 
-// 🚀 APPLIKATIONSSTART
-window.addEventListener("DOMContentLoaded", async () => {
+async function initApp() {
     generate104Matches();
     buildKachelnAndTabs();
-    updateWelcomeMessage();
+    
     await fetchServerData();
+    
+    updateWelcomeMessage();
+    renderMatches();
+    renderGruppen();
+    renderLeaderboard(); 
+    renderWMResultsTab();
+    
     switchTab("tippen");
-});
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initApp);
+} else {
+    initApp();
+}

@@ -46,14 +46,27 @@ async function getFromSupabase(table) {
 }
 
 // 🌐 DATEN IN SUPABASE SPEICHERN / ÜBERSCHREIBEN (POST)
+// 🌐 DATEN IN SUPABASE SPEICHERN / ÜBERSCHREIBEN (POST mit Upsert-Logik)
 async function saveToSupabase(table, body) {
     const url = `${SUPABASE_URL}/rest/v1/${table}`;
+    
+    // Wir bauen die Erlaubnis zum Überschreiben dynamisch ein
     const headers = {
         "apikey": SUPABASE_KEY,
         "Authorization": `Bearer ${SUPABASE_KEY}`,
         "Content-Type": "application/json",
-        "Prefer": "resolution=merge-duplicates" // Verhindert Fehler bei doppelten Einträgen
+        "Prefer": "resolution=merge-duplicates" 
     };
+
+    // Falls ein Tipp geändert wird, sagen wir Supabase, woran es den alten Tipp erkennt:
+    if (table === "wm_tips") {
+        headers["Prefer"] = "return=representation,resolution=merge-duplicates,on_conflict=user_name,match_id";
+    }
+    // Falls ein User seine Bonus-Tipps nachträglich ändert:
+    if (table === "wm_bonus_tips") {
+        headers["Prefer"] = "return=representation,resolution=merge-duplicates,on_conflict=user_name";
+    }
+
     try {
         const response = await fetch(url, { method: "POST", headers: headers, body: JSON.stringify(body) });
         if (!response.ok) {
@@ -67,7 +80,6 @@ async function saveToSupabase(table, body) {
         return false;
     }
 }
-
 function generate104Matches() {
     const gruppenMatches = [
         { phase: "Gruppe A", cat: "Gruppe A-D", date: "11.06.2026", time: "21:00", h: "Mexiko 🇲🇽", a: "Südafrika 🇿🇦" },

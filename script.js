@@ -47,10 +47,10 @@ async function getFromSupabase(table) {
 
 // 🌐 DATEN IN SUPABASE SPEICHERN / ÜBERSCHREIBEN (POST)
 // 🌐 DATEN IN SUPABASE SPEICHERN / ÜBERSCHREIBEN (POST mit Upsert-Logik)
+// 🌐 DATEN IN SUPABASE SPEICHERN / ÜBERSCHREIBEN (POST mit sauberer Upsert-Logik)
 async function saveToSupabase(table, body) {
-    const url = `${SUPABASE_URL}/rest/v1/${table}`;
+    let url = `${SUPABASE_URL}/rest/v1/${table}`;
     
-    // Wir bauen die Erlaubnis zum Überschreiben dynamisch ein
     const headers = {
         "apikey": SUPABASE_KEY,
         "Authorization": `Bearer ${SUPABASE_KEY}`,
@@ -58,13 +58,16 @@ async function saveToSupabase(table, body) {
         "Prefer": "resolution=merge-duplicates" 
     };
 
-    // Falls ein Tipp geändert wird, sagen wir Supabase, woran es den alten Tipp erkennt:
+    // Für die Spiel-Tipps: Wenn der Tipp existiert (user_name + match_id gleich), überschreiben!
     if (table === "wm_tips") {
-        headers["Prefer"] = "return=representation,resolution=merge-duplicates,on_conflict=user_name,match_id";
+        headers["Prefer"] = "return=representation,resolution=merge-duplicates";
+        url += "?on_conflict=user_name,match_id";
     }
-    // Falls ein User seine Bonus-Tipps nachträglich ändert:
+    
+    // Für die Bonus-Tipps: Wenn der User existiert (user_name gleich), überschreiben!
     if (table === "wm_bonus_tips") {
-        headers["Prefer"] = "return=representation,resolution=merge-duplicates,on_conflict=user_name";
+        headers["Prefer"] = "return=representation,resolution=merge-duplicates";
+        url += "?on_conflict=user_name";
     }
 
     try {

@@ -1,4 +1,4 @@
-// ⚠️ DEINE DATEN VON SUPABASE (AUTOMATISCH EINGETRAGEN)
+// ⚠️ DEINE DATEN VON SUPABASE
 const SUPABASE_URL = "https://abzivpkrhespyvubtcer.supabase.co"; 
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFieml2cGtyaGVzcHl2dWJ0Y2VyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0MjQ0MzIsImV4cCI6MjA5NjAwMDQzMn0.V2_K_GOQIgvhTmHRDl5y0EyF0AbeopYJ-u8ermrgOl8";
 
@@ -13,20 +13,128 @@ let serverBonusTips = {};
 
 const ADMIN_PASSWORD = "wm2026admin"; 
 
-const gruppenDaten = {
-    "Gruppe A": ["Mexiko 🇲🇽", "Südafrika 🇿🇦", "Südkorea 🇰🇷", "Tschechien 🇨🇿"],
-    "Gruppe B": ["Kanada 🇨🇦", "Bosnien-Herzegowina 🇧🇦", "Katar 🇶🇦", "Schweiz 🇨🇭"],
-    "Gruppe C": ["Brasilien 🇧🇷", "Marokko 🇲🇦", "Haiti 🇭🇹", "Schottland 🏴󠁧󠁢󠁳󠁣󠁴󠁿"],
-    "Gruppe D": ["USA 🇺🇸", "Paraguay 🇵🇾", "Australien 🇦🇺", "Türkei 🇹🇷"],
-    "Gruppe E": ["Deutschland 🇩🇪", "Curaçao 🇨🇼", "Elfenbeinküste 🇨🇮", "Ecuador 🇪🇨"],
-    "Gruppe F": ["Niederlande 🇳🇱", "Japan 🇯🇵", "Schweden 🇸🇪", "Tunesien 🇹🇳"],
-    "Gruppe G": ["Belgien 🇧🇪", "Ägypten 🇪🇬", "Iran 🇮🇷", "Neuseeland 🇳🇿"],
-    "Gruppe H": ["Spanien 🇪🇸", "Kap Verde 🇨🇻", "Saudi-Arabien 🇸🇦", "Uruguay 🇺🇾"],
-    "Gruppe I": ["Frankreich 🇫🇷", "Senegal 🇸🇳", "Irak 🇮🇶", "Norwegen 🇳🇴"],
-    "Gruppe J": ["Argentinien 🇦🇷", "Algerien 🇩🇿", "Österreich 🇦🇹", "Jordanien 🇯🇴"],
-    "Gruppe K": ["Portugal 🇵🇹", "DR Kongo 🇨🇩", "Usbekistan 🇺🇿", "Kolumbien 🇨🇴"],
-    "Gruppe L": ["England 🏴󠁧󠁢󠁥󠁮󠁧󠁿", "Kroatien 🇭🇷", "Ghana 🇬🇭", "Panama 🇵🇦"]
-};
+// 📅 DER KOMPLETTE SPIELPLAN (ALLE 104 SPIELE)
+const gruppenMatches = [
+    // Spielrunde 1
+    { phase: "Gruppe A", date: "11.06.2026", time: "21:00", h: "Mexiko 🇲🇽", a: "Südafrika 🇿🇦" },
+    { phase: "Gruppe A", date: "12.06.2026", time: "04:00", h: "Südkorea 🇰🇷", a: "Tschechien 🇨🇿" },
+    { phase: "Gruppe B", date: "12.06.2026", time: "21:00", h: "Kanada 🇨🇦", a: "Bosnien-Herzegowina 🇧🇦" },
+    { phase: "Gruppe D", date: "13.06.2026", time: "03:00", h: "USA 🇺🇸", a: "Paraguay 🇵🇾" },
+    { phase: "Gruppe B", date: "13.06.2026", time: "21:00", h: "Katar 🇶🇦", a: "Schweiz 🇨🇭" },
+    { phase: "Gruppe C", date: "14.06.2026", time: "00:00", h: "Brasilien 🇧🇷", a: "Marokko 🇲🇦" },
+    { phase: "Gruppe C", date: "14.06.2026", time: "03:00", h: "Haiti 🇭🇹", a: "Schottland 🏴󠁧󠁢󠁳󠁣󠁴󠁿" },
+    { phase: "Gruppe D", date: "14.06.2026", time: "06:00", h: "Australien 🇦🇺", a: "Türkei 🇹🇷" },
+    { phase: "Gruppe E", date: "14.06.2026", time: "19:00", h: "Deutschland 🇩🇪", a: "Curaçao 🇨🇼" },
+    { phase: "Gruppe F", date: "14.06.2026", time: "22:00", h: "Niederlande 🇳🇱", a: "Japan 🇯🇵" },
+    { phase: "Gruppe E", date: "15.06.2026", time: "01:00", h: "Elfenbeinküste 🇨🇮", a: "Ecuador 🇪🇨" },
+    { phase: "Gruppe F", date: "15.06.2026", time: "04:00", h: "Schweden 🇸🇪", a: "Tunesien 🇹🇳" },
+    { phase: "Gruppe H", date: "15.06.2026", time: "18:00", h: "Spanien 🇪🇸", a: "Kap Verde 🇨🇻" },
+    { phase: "Gruppe G", date: "15.06.2026", time: "21:00", h: "Belgien 🇧🇪", a: "Ägypten 🇪🇬" },
+    { phase: "Gruppe H", date: "16.06.2026", time: "00:00", h: "Saudi-Arabien 🇸🇦", a: "Uruguay 🇺🇾" },
+    { phase: "Gruppe G", date: "16.06.2026", time: "03:00", h: "Iran 🇮🇷", a: "Neuseeland 🇳🇿" },
+    { phase: "Gruppe I", date: "16.06.2026", time: "21:00", h: "Frankreich 🇫🇷", a: "Senegal 🇸🇳" },
+    { phase: "Gruppe I", date: "17.06.2026", time: "00:00", h: "Irak 🇮🇶", a: "Norwegen 🇳🇴" },
+    { phase: "Gruppe J", date: "17.06.2026", time: "03:00", h: "Argentinien 🇦🇷", a: "Algerien 🇩🇿" },
+    { phase: "Gruppe J", date: "17.06.2026", time: "06:00", h: "Österreich 🇦🇹", a: "Jordanien 🇯🇴" },
+    { phase: "Gruppe K", date: "17.06.2026", time: "19:00", h: "Portugal 🇵🇹", a: "DR Kongo 🇨🇩" },
+    { phase: "Gruppe L", date: "17.06.2026", time: "22:00", h: "England 🏴󠁧󠁢󠁥󠁮󠁧󠁿", a: "Kroatien 🇭🇷" },
+    { phase: "Gruppe L", date: "18.06.2026", time: "01:00", h: "Ghana 🇬🇭", a: "Panama 🇵🇦" },
+    { phase: "Gruppe K", date: "18.06.2026", time: "04:00", h: "Usbekistan 🇺🇿", a: "Kolumbien 🇨🇴" },
+
+    // Spielrunde 2
+    { phase: "Gruppe A", date: "18.06.2026", time: "18:00", h: "Tschechien 🇨🇿", a: "Südafrika 🇿🇦" },
+    { phase: "Gruppe B", date: "18.06.2026", time: "21:00", h: "Schweiz 🇨🇭", a: "Bosnien-Herzegowina 🇧🇦" },
+    { phase: "Gruppe B", date: "19.06.2026", time: "00:00", h: "Kanada 🇨🇦", a: "Katar 🇶🇦" },
+    { phase: "Gruppe A", date: "19.06.2026", time: "03:00", h: "Mexiko 🇲🇽", a: "Südkorea 🇰🇷" },
+    { phase: "Gruppe D", date: "19.06.2026", time: "21:00", h: "USA 🇺🇸", a: "Australien 🇦🇺" },
+    { phase: "Gruppe C", date: "20.06.2026", time: "00:00", h: "Schottland 🏴󠁧󠁢󠁳󠁣󠁴󠁿", a: "Marokko 🇲🇦" },
+    { phase: "Gruppe C", date: "20.06.2026", time: "03:00", h: "Brasilien 🇧🇷", a: "Haiti 🇭🇹" },
+    { phase: "Gruppe D", date: "20.06.2026", time: "06:00", h: "Türkei 🇹🇷", a: "Paraguay 🇵🇾" },
+    { phase: "Gruppe F", date: "20.06.2026", time: "19:00", h: "Niederlande 🇳🇱", a: "Japan 🇯🇵" },
+    { phase: "Gruppe E", date: "20.06.2026", time: "22:00", h: "Deutschland 🇩🇪", a: "Elfenbeinküste 🇨🇮" },
+    { phase: "Gruppe E", date: "21.06.2026", time: "02:00", h: "Ecuador 🇪🇨", a: "Curaçao 🇨🇼" },
+    { phase: "Gruppe F", date: "21.06.2026", time: "06:00", h: "Tunesien 🇹🇳", a: "Schweden 🇸🇪" },
+    { phase: "Gruppe H", date: "21.06.2026", time: "18:00", h: "Spanien 🇪🇸", a: "Kap Verde 🇨🇻" },
+    { phase: "Gruppe G", date: "21.06.2026", time: "21:00", h: "Belgien 🇧🇪", a: "Ägypten 🇪🇬" },
+    { phase: "Gruppe H", date: "22.06.2026", time: "00:00", h: "Uruguay 🇺🇾", a: "Saudi-Arabien 🇸🇦" },
+    { phase: "Gruppe G", date: "22.06.2026", time: "03:00", h: "Iran 🇮🇷", a: "Neuseeland 🇳🇿" },
+    { phase: "Gruppe J", date: "22.06.2026", time: "19:00", h: "Argentinien 🇦🇷", a: "Österreich 🇦🇹" },
+    { phase: "Gruppe I", date: "22.06.2026", time: "23:00", h: "Frankreich 🇫🇷", a: "Irak 🇮🇶" },
+    { phase: "Gruppe I", date: "23.06.2026", time: "02:00", h: "Norwegen 🇳🇴", a: "Senegal 🇸🇳" },
+    { phase: "Gruppe J", date: "23.06.2026", time: "06:00", h: "Jordanien 🇯🇴", a: "Algerien 🇩🇿" },
+    { phase: "Gruppe K", date: "23.06.2026", time: "19:00", h: "Portugal 🇵🇹", a: "Usbekistan 🇺🇿" },
+    { phase: "Gruppe L", date: "23.06.2026", time: "22:00", h: "England 🏴󠁧󠁢󠁥󠁮󠁧󠁿", a: "Ghana 🇬🇭" },
+    { phase: "Gruppe L", date: "24.06.2026", time: "01:00", h: "Panama 🇵🇦", a: "Kroatien 🇭🇷" },
+    { phase: "Gruppe K", date: "24.06.2026", time: "04:00", h: "Kolumbien 🇨🇴", a: "DR Kongo 🇨🇩" },
+
+    // Spielrunde 3
+    { phase: "Gruppe A", date: "24.06.2026", time: "21:00", h: "Südafrika 🇿🇦", a: "Südkorea 🇰🇷" },
+    { phase: "Gruppe A", date: "24.06.2026", time: "21:00", h: "Tschechien 🇨🇿", a: "Mexiko 🇲🇽" },
+    { phase: "Gruppe B", date: "25.06.2026", time: "00:00", h: "Bosnien-Herzegowina 🇧🇦", a: "Katar 🇶🇦" },
+    { phase: "Gruppe B", date: "25.06.2026", time: "00:00", h: "Schweiz 🇨🇭", a: "Kanada 🇨🇦" },
+    { phase: "Gruppe C", date: "25.06.2026", time: "21:00", h: "Marokko 🇲🇦", a: "Haiti 🇭🇹" },
+    { phase: "Gruppe C", date: "25.06.2026", time: "21:00", h: "Schottland 🏴󠁧󠁢󠁳󠁣󠁴󠁿", a: "Brasilien 🇧🇷" },
+    { phase: "Gruppe D", date: "26.06.2026", time: "00:00", h: "Paraguay 🇵🇾", a: "Australien 🇦🇺" },
+    { phase: "Gruppe D", date: "26.06.2026", time: "00:00", h: "Türkei 🇹🇷", a: "USA 🇺🇸" },
+    { phase: "Gruppe E", date: "26.06.2026", time: "21:00", h: "Curaçao 🇨🇼", a: "Elfenbeinküste 🇨🇮" },
+    { phase: "Gruppe E", date: "26.06.2026", time: "21:00", h: "Ecuador 🇪🇨", a: "Deutschland 🇩🇪" },
+    { phase: "Gruppe F", date: "27.06.2026", time: "00:00", h: "Japan 🇯🇵", a: "Tunesien 🇹🇳" },
+    { phase: "Gruppe F", date: "27.06.2026", time: "00:00", h: "Schweden 🇸🇪", a: "Niederlande 🇳🇱" },
+    { phase: "Gruppe G", date: "27.06.2026", time: "21:00", h: "Ägypten 🇪🇬", a: "Iran 🇮🇷" },
+    { phase: "Gruppe G", date: "27.06.2026", time: "21:00", h: "Neuseeland 🇳🇿", a: "Belgien 🇧🇪" },
+    { phase: "Gruppe H", date: "28.06.2026", time: "00:00", h: "Kap Verde 🇨🇻", a: "Saudi-Arabien 🇸🇦" },
+    { phase: "Gruppe H", date: "28.06.2026", time: "00:00", h: "Uruguay 🇺🇾", a: "Spanien 🇪🇸" },
+    { phase: "Gruppe I", date: "28.06.2026", time: "21:00", h: "Senegal 🇸🇳", a: "Irak 🇮🇶" },
+    { phase: "Gruppe I", date: "28.06.2026", time: "21:00", h: "Norwegen 🇳🇴", a: "Frankreich 🇫🇷" },
+    { phase: "Gruppe J", date: "29.06.2026", time: "00:00", h: "Algerien 🇩🇿", a: "Österreich 🇦🇹" },
+    { phase: "Gruppe J", date: "29.06.2026", time: "00:00", h: "Jordanien 🇯🇴", a: "Argentinien 🇦🇷" },
+    { phase: "Gruppe K", date: "29.06.2026", time: "21:00", h: "DR Kongo 🇨🇩", a: "Usbekistan 🇺🇿" },
+    { phase: "Gruppe K", date: "29.06.2026", time: "21:00", h: "Kolumbien 🇨🇴", a: "Portugal 🇵🇹" },
+    { phase: "Gruppe L", date: "30.06.2026", time: "00:00", h: "Kroatien 🇭🇷", a: "Ghana 🇬🇭" },
+    { phase: "Gruppe L", date: "30.06.2026", time: "00:00", h: "Panama 🇵🇦", a: "England 🏴󠁧󠁢󠁥󠁮󠁧󠁿" },
+
+    // K.o.-Runde der letzten 32
+    { phase: "Sechzehntelfinale", date: "03.07.2026", time: "21:00", h: "Sieger Gruppe A", a: "Zweiter Gruppe C" },
+    { phase: "Sechzehntelfinale", date: "04.07.2026", time: "01:00", h: "Sieger Gruppe B", a: "Dritter Gruppe A/C/D" },
+    { phase: "Sechzehntelfinale", date: "04.07.2026", time: "18:00", h: "Zweiter Gruppe A", a: "Zweiter Gruppe B" },
+    { phase: "Sechzehntelfinale", date: "04.07.2026", time: "22:00", h: "Sieger Gruppe C", a: "Zweiter Gruppe D" },
+    { phase: "Sechzehntelfinale", date: "05.07.2026", time: "18:00", h: "Sieger Gruppe E", a: "Zweiter Gruppe F" },
+    { phase: "Sechzehntelfinale", date: "05.07.2026", time: "22:00", h: "Sieger Gruppe F", a: "Dritter Gruppe C/E/F" },
+    { phase: "Sechzehntelfinale", date: "06.07.2026", time: "18:00", h: "Sieger Gruppe G", a: "Zweiter Gruppe H" },
+    { phase: "Sechzehntelfinale", date: "06.07.2026", time: "22:00", h: "Sieger Gruppe H", a: "Dritter Gruppe E/G/H" },
+    { phase: "Sechzehntelfinale", date: "07.07.2026", time: "18:00", h: "Sieger Gruppe I", a: "Zweiter Gruppe J" },
+    { phase: "Sechzehntelfinale", date: "07.07.2026", time: "22:00", h: "Sieger Gruppe J", a: "Dritter Gruppe I/K/L" },
+    { phase: "Sechzehntelfinale", date: "08.07.2026", time: "18:00", h: "Sieger Gruppe K", a: "Zweiter Gruppe L" },
+    { phase: "Sechzehntelfinale", date: "08.07.2026", time: "22:00", h: "Sieger Gruppe L", a: "Zweiter Gruppe K" },
+    { phase: "Sechzehntelfinale", date: "09.07.2026", time: "18:00", h: "Sieger Gruppe D", a: "Dritter Gruppe B/F/G" },
+    { phase: "Sechzehntelfinale", date: "09.07.2026", time: "22:00", h: "Zweiter Gruppe I", a: "Zweiter Gruppe E" },
+    { phase: "Sechzehntelfinale", date: "10.07.2026", time: "18:00", h: "Zweiter Gruppe G", a: "Zweiter Gruppe J" },
+    { phase: "Sechzehntelfinale", date: "10.07.2026", time: "22:00", h: "Zweiter Gruppe B", a: "Zweiter Gruppe F" },
+
+    // Achtelfinale
+    { phase: "Achtelfinale", date: "11.07.2026", time: "22:00", h: "Gewinner S1", a: "Gewinner S2" },
+    { phase: "Achtelfinale", date: "12.07.2026", time: "02:00", h: "Gewinner S3", a: "Gewinner S4" },
+    { phase: "Achtelfinale", date: "12.07.2026", time: "22:00", h: "Gewinner S5", a: "Gewinner S6" },
+    { phase: "Achtelfinale", date: "13.07.2026", time: "02:00", h: "Gewinner S7", a: "Gewinner S8" },
+    { phase: "Achtelfinale", date: "13.07.2026", time: "22:00", h: "Gewinner S9", a: "Gewinner S10" },
+    { phase: "Achtelfinale", date: "14.07.2026", time: "02:00", h: "Gewinner S11", a: "Gewinner S12" },
+    { phase: "Achtelfinale", date: "14.07.2026", time: "22:00", h: "Gewinner S13", a: "Gewinner S14" },
+    { phase: "Achtelfinale", date: "15.07.2026", time: "02:00", h: "Gewinner S15", a: "Gewinner S16" },
+
+    // Viertelfinale
+    { phase: "Viertelfinale", date: "17.07.2026", time: "21:00", h: "Gewinner A1", a: "Gewinner A2" },
+    { phase: "Viertelfinale", date: "18.07.2026", time: "02:00", h: "Gewinner A3", a: "Gewinner A4" },
+    { phase: "Viertelfinale", date: "18.07.2026", time: "21:00", h: "Gewinner A5", a: "Gewinner A6" },
+    { phase: "Viertelfinale", date: "19.07.2026", time: "02:00", h: "Gewinner A7", a: "Gewinner A8" },
+
+    // Halbfinale
+    { phase: "Halbfinale", date: "22.07.2026", time: "22:00", h: "Gewinner V1", a: "Gewinner V2" },
+    { phase: "Halbfinale", date: "23.07.2026", time: "22:00", h: "Gewinner V3", a: "Gewinner V4" },
+
+    // Platz 3 & Finale
+    { phase: "Spiel um Platz 3", date: "25.07.2026", time: "22:00", h: "Verlierer H1", a: "Verlierer H2" },
+    { phase: "Finale", date: "26.07.2026", time: "21:00", h: "Gewinner H1", a: "Gewinner H2" }
+];
 
 // 🌐 DATEN AUS SUPABASE LADEN (GET)
 async function getFromSupabase(table) {
@@ -46,7 +154,7 @@ async function getFromSupabase(table) {
     }
 }
 
-// 🌐 DATEN IN SUPABASE SPEICHERN ODER AKTUALISIEREN (POST / PATCH)
+// 🌐 DATEN SPEICHERN ODER AKTUALISIEREN (POST / PATCH)
 async function saveToSupabase(table, body, method = "POST", rowId = null) {
     let url = `${SUPABASE_URL}/rest/v1/${table}`;
     
@@ -70,12 +178,12 @@ async function saveToSupabase(table, body, method = "POST", rowId = null) {
         return true;
     } catch (e) {
         console.error(e);
-        alert("Fehler beim Speichern in der Cloud: " + e.message);
+        alert("Fehler beim Speichern: " + e.message);
         return false;
     }
 }
 
-// 👤 TIPPER ANMELDEN / REGISTRIEREN
+// 👤 TIPPER ANMELDEN
 async function registerUser() {
     const nameInput = document.getElementById("username").value.trim();
     const pinInput = document.getElementById("userpin").value.trim();
@@ -88,18 +196,17 @@ async function registerUser() {
             isAdmin = true;
             currentUser = "Admin⚙️";
             currentPin = "";
-            alert("Als Admin autorisiert! Du kannst Ergebnisse setzen.");
+            alert("Als Admin autorisiert!");
             updateWelcomeMessage();
             renderMatches();
         } else {
-            alert("Falsches Admin-Passwort!");
+            alert("Falsches Passwort!");
         }
         return;
     }
 
-    if(pinInput.length < 4) { alert("Bitte eine 4-stellige PIN ausdenken/eingeben!"); return; }
+    if(pinInput.length < 4) { alert("Bitte eine 4-stellige PIN eingeben!"); return; }
 
-    // Prüfen, ob der User in wm_bonus_tips existiert
     const checkUrl = `${SUPABASE_URL}/rest/v1/wm_bonus_tips?user_name=eq.${encodeURIComponent(nameInput)}`;
     let existingRowId = null;
 
@@ -129,9 +236,7 @@ async function registerUser() {
     localStorage.setItem("wm_user_2026", currentUser);
     localStorage.setItem("wm_pin_2026", currentPin);
     
-    const saveData = {
-        user_name: currentUser, pin: currentPin, wm_tip: wmTip, scorer_tip: scorerTip
-    };
+    const saveData = { user_name: currentUser, pin: currentPin, wm_tip: wmTip, scorer_tip: scorerTip };
 
     let success = false;
     if (existingRowId) {
@@ -148,7 +253,7 @@ async function registerUser() {
     }
 }
 
-// ⚽ NORMALEN SPIELTIPP ABGEBEN
+// ⚽ SPIELTIPP ABGEBEN
 async function submitTip(matchId) {
     if (!currentUser || currentUser === "Admin⚙️") {
         alert("Bitte melde dich zuerst als Tipper an!");
@@ -165,7 +270,6 @@ async function submitTip(matchId) {
 
     const scoreString = `${homeInput}:${awayInput}`;
 
-    // Prüfen, ob für diesen User + dieses Match schon ein Tipp in wm_tips existiert
     const checkUrl = `${SUPABASE_URL}/rest/v1/wm_tips?user_name=eq.${encodeURIComponent(currentUser)}&match_id=eq.${matchId}`;
     let existingTipId = null;
 
@@ -176,10 +280,10 @@ async function submitTip(matchId) {
         });
         const data = await res.json();
         if (data && data.length > 0) {
-            existingTipId = data[0].id; // Gefunden -> wir patchen es gleich
+            existingTipId = data[0].id;
         }
     } catch (e) {
-        console.error("Fehler bei Tipp-Duplikat-Prüfung", e);
+        console.error(e);
     }
 
     const matchObj = matches.find(m => m.id === matchId);
@@ -194,10 +298,8 @@ async function submitTip(matchId) {
 
     let success = false;
     if (existingTipId) {
-        // Bestehenden Tipp aktualisieren
         success = await saveToSupabase("wm_tips", saveData, "PATCH", existingTipId);
     } else {
-        // Neuen Tipp anlegen
         success = await saveToSupabase("wm_tips", saveData, "POST");
     }
 
@@ -222,7 +324,6 @@ async function submitResult(matchId) {
 
     const resultString = `${homeRes}:${awayRes}`;
 
-    // Prüfen, ob das Match bereits in wm_results existiert
     const checkUrl = `${SUPABASE_URL}/rest/v1/wm_results?match_id=eq.${matchId}`;
     let existingResultId = null;
 
@@ -239,10 +340,7 @@ async function submitResult(matchId) {
         console.error(e);
     }
 
-    const saveData = {
-        match_id: matchId,
-        result: resultString
-    };
+    const saveData = { match_id: matchId, result: resultString };
 
     let success = false;
     if (existingResultId) {
@@ -264,55 +362,49 @@ async function fetchServerData() {
     
     const results = await getFromSupabase("wm_results");
     serverResults = {};
-    results.forEach(r => {
-        serverResults[r.match_id] = r.result;
-    });
+    results.forEach(r => { serverResults[r.match_id] = r.result; });
 
     const bonus = await getFromSupabase("wm_bonus_tips");
     serverBonusTips = {};
-    bonus.forEach(b => {
-        serverBonusTips[b.user_name] = { wm: b.wm_tip, scorer: b.scorer_tip };
-    });
+    bonus.forEach(b => { serverBonusTips[b.user_name] = { wm: b.wm_tip, scorer: b.scorer_tip }; });
 }
 
-// 📑 SPIELPLAN GENERIEREN
-function generate104Matches() {
-    const gruppenMatches = [
-        { phase: "Gruppe A", cat: "Gruppe A-D", date: "11.06.2026", time: "21:00", h: "Mexiko 🇲🇽", a: "Südafrika 🇿🇦" },
-        { phase: "Gruppe A", cat: "Gruppe A-D", date: "12.06.2026", time: "04:00", h: "Südkorea 🇰🇷", a: "Tschechien 🇨🇿" },
-        { phase: "Gruppe B", cat: "Gruppe A-D", date: "12.06.2026", time: "21:00", h: "Kanada 🇨🇦", a: "Bosnien-Herzegowina 🇧🇦" },
-        { phase: "Gruppe D", cat: "Gruppe A-D", date: "13.06.2026", time: "03:00", h: "USA 🇺🇸", a: "Paraguay 🇵🇾" },
-        { phase: "Gruppe B", cat: "Gruppe A-D", date: "13.06.2026", time: "21:00", h: "Katar 🇶🇦", a: "Schweiz 🇨🇭" },
-        { phase: "Gruppe C", cat: "Gruppe A-D", date: "14.06.2026", time: "00:00", h: "Brasilien 🇧🇷", a: "Marokko 🇲🇦" },
-        { phase: "Gruppe C", cat: "Gruppe A-D", date: "14.06.2026", time: "03:00", h: "Haiti 🇭🇹", a: "Schottland 🏴\u200D󠁢󠁳󠁣󠁴󠁿" },
-        { phase: "Gruppe D", cat: "Gruppe A-D", date: "14.06.2026", time: "06:00", h: "Australien 🇦🇺", a: "Türkei 🇹🇷" }
-    ];
-
-    let idCounter = 1;
-    gruppenMatches.forEach(m => {
-        matches.push({ id: idCounter++, ...m });
-    });
+// 📑 SPIELPLAN BAUEN
+function buildMatches() {
+    if (typeof gruppenMatches !== 'undefined' && gruppenMatches.length > 0) {
+        matches.length = 0; 
+        let idCounter = 1;
+        gruppenMatches.forEach(m => {
+            matches.push({ id: idCounter++, ...m });
+        });
+    }
 }
 
 // 🖨️ WILLKOMMENSNACHRICHT ANPASSEN
 function updateWelcomeMessage() {
     const msgZone = document.getElementById("welcome-message");
-    if(currentUser) {
-        msgZone.innerHTML = `Eingeloggt als: <strong>${currentUser}</strong>`;
-    } else {
-        msgZone.innerHTML = "Bitte melde dich an, um deine Tipps abzugeben.";
+    if(msgZone) {
+        if(currentUser) {
+            msgZone.innerHTML = `Eingeloggt als: <strong>${currentUser}</strong>`;
+        } else {
+            msgZone.innerHTML = "Bitte melde dich an, um deine Tipps abzugeben.";
+        }
     }
 }
 
 // 🎨 SPIELE IM HTML ANZEIGEN
 function renderMatches() {
     const container = document.getElementById("matches-container");
+    if (!container) return;
+    
     container.innerHTML = "";
 
-    const filterVal = document.getElementById("filter-phase").value;
+    const filterVal = document.getElementById("filter-phase") ? document.getElementById("filter-phase").value : "all";
+    let angezeigteSpiele = 0;
 
     matches.forEach(m => {
         if (filterVal !== "all" && m.phase !== filterVal) return;
+        angezeigteSpiele++;
 
         const serverResult = serverResults[m.id] || "-:-";
         
@@ -330,11 +422,10 @@ function renderMatches() {
             tplAway = parts[1];
         }
 
-        // Andere Tipps sammeln
         const andereTipps = serverTips.filter(t => t.match_id === m.id && t.user_name !== currentUser);
         let andereHTML = "";
         if (andereTipps.length > 0) {
-            andereHTML = `<div class="other-tips">💡 Tipps der anderen: ` + 
+            andereHTML = `<div class="other-tips">💡 Tipps: ` + 
                 andereTipps.map(t => `<span>👤 ${t.user_name}: ${t.score}</span>`).join(" ") + 
                 `</div>`;
         }
@@ -369,16 +460,25 @@ function renderMatches() {
 
         container.appendChild(card);
     });
+
+    if (angezeigteSpiele === 0) {
+        container.innerHTML = `<div style="text-align:center; padding: 20px; color: #888;">
+            Für die Auswahl "${filterVal}" sind aktuell keine Spiele eingetragen. <br>
+            Stelle den Filter oben auf <strong>"Alle Spiele"</strong>!
+        </div>`;
+    }
 }
 
-// 🚀 START BEIM LADEN DER SEITE
+// 🚀 START
 window.addEventListener("DOMContentLoaded", async () => {
-    generate104Matches();
+    buildMatches();
     updateWelcomeMessage();
-    
     await fetchServerData();
     renderMatches();
 
-    document.getElementById("btn-register").addEventListener("click", registerUser);
-    document.getElementById("filter-phase").addEventListener("change", renderMatches);
+    const registerBtn = document.getElementById("btn-register");
+    if(registerBtn) registerBtn.addEventListener("click", registerUser);
+    
+    const filterSelect = document.getElementById("filter-phase");
+    if(filterSelect) filterSelect.addEventListener("change", renderMatches);
 });

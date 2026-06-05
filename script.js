@@ -68,8 +68,8 @@ async function saveToSupabase(table, body, method = "POST") {
 
     if (method === "PATCH") {
         url += `?user_name=eq.${encodeURIComponent(body.user_name)}&pin=eq.${encodeURIComponent(body.pin)}`;
-        // Fix: Prüfen, ob wir ein konkretes Match updaten wollen
-        if (body.match_id !== undefined && body.match_id !== null) {
+        // FIX: Korrekte Filterung bei Tabellen-Updates für Match-Tipps
+        if (table === "wm_tips" && body.match_id !== undefined) {
             url += `&match_id=eq.${body.match_id}`;
         }
     }
@@ -657,7 +657,8 @@ function renderLeaderboard() {
         </div>
     `;
 
-    renderAllUserTips();
+    // FIX: Wir rufen die Detail-Funktion hier nicht mehr blind auf, da der Default-Filter "" (leer) ist.
+    // Das verhindert unnötige Fehlermeldungen beim ersten Laden des Tabs.
 }
 
 // 🔍 ZEIGT DIE LIVE-TIPPS ALLER USER FÜR EIN BESTIMMTES SPIEL AN
@@ -667,9 +668,16 @@ function renderAllUserTips() {
     if (!selectEl || !displayContainer) return;
 
     const matchId = parseInt(selectEl.value);
-    if (!matchId) return;
+    
+    // Falls kein valides Spiel gewählt wurde, Fallback-Text anzeigen
+    if (!matchId || isNaN(matchId)) {
+        displayContainer.innerHTML = `<p style="color:#718096; margin:0;">Wähle oben ein Spiel aus, um zu sehen, was die anderen getippt haben.</p>`;
+        return;
+    }
 
     const currentMatch = matches.find(m => m.id === matchId);
+    if (!currentMatch) return;
+
     const officialResult = serverResults[matchId];
     const matchTips = serverTips.filter(t => t.match_id === matchId);
 
@@ -684,7 +692,7 @@ function renderAllUserTips() {
         htmlContent += `<p style="color:#a0aec0; margin:0; font-style:italic;">Für dieses Spiel wurden noch keine Tipps abgegeben.</p>`;
     } else {
         htmlContent += `
-            <table style="width:100%; border-collapse:collapse; background:white; border-radius:6px; overflow:hidden;">
+            <table style="width:100%; border-collapse:collapse; background:white; border-radius:6px; overflow:hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
                 <thead>
                     <tr style="background:#edf2f7; font-size:0.9rem;">
                         <th style="padding:8px; text-align:left;">Mitspieler</th>

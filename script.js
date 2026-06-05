@@ -1,6 +1,6 @@
 // ⚠️ HIER DEINE DATEN VON SUPABASE EINTRAGEN!
 const SUPABASE_URL = "https://abzivpkrhespyvubtcer.supabase.co"; 
-const SUPABASE_KEY = "HIER_DEINEN_ANON_PUBLIC_KEY_EINFUEGEN";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFieml2cGtyaGVzcHl2dWJ0Y2VyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0MjQ0MzIsImV4cCI6MjA5NjAwMDQzMn0.V2_K_GOQIgvhTmHRDl5y0EyF0AbeopYJ-u8ermrgOl8";
 
 let currentUser = localStorage.getItem("wm_user_2026") || "";
 let currentPin = localStorage.getItem("wm_pin_2026") || ""; // Merkt sich die PIN

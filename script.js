@@ -220,15 +220,23 @@ function generate104Matches() {
 }
 
 // 📊 UPDATET LOKALE VARIABLEN AUS SERVER-DATENSÄTZEN
+// 📊 UPDATET LOKALE VARIABLEN AUS SERVER-DATENSÄTZEN
 async function fetchServerData() {
     const tipsData = await getFromSupabase("wm_tips");
     const resultsData = await getFromSupabase("wm_results");
     const bonusData = await getFromSupabase("wm_bonus_tips");
 
+    // Hier behalten wir die exakten Namen bei, die auch in der Datenbank stehen!
     serverTips = tipsData.map(t => ({
         id: t.id, 
-        user: t.user_name, pin: t.pin, matchId: t.match_id, matchTeams: t.match_teams,
-        phase: t.phase, score: t.score, homeGoals: t.home_goals, awayGoals: t.away_goals
+        user_name: t.user_name, 
+        pin: t.pin, 
+        match_id: t.match_id, 
+        match_teams: t.match_teams,
+        phase: t.phase, 
+        score: t.score, 
+        home_goals: t.home_goals, 
+        away_goals: t.away_goals
     }));
 
     serverResults = {};
@@ -238,7 +246,6 @@ async function fetchServerData() {
 
     serverBonusTips = {};
     bonusData.forEach(b => {
-        // Wir speichern die Bonustipps jetzt über die Kombination aus Name UND Pin ab!
         serverBonusTips[`${b.user_name}_${b.pin}`] = { pin: b.pin, wm: b.wm_tip, scorer: b.scorer_tip };
     });
 }

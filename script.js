@@ -58,18 +58,22 @@ async function getFromSupabase(table) {
 // 🌐 DATEN IN SUPABASE SPEICHERN ODER AKTUALISIEREN (POST / PATCH)
 async function saveToSupabase(table, body, method = "POST", rowId = null) {
     let url = `${SUPABASE_URL}/rest/v1/${table}`;
-     
-    if (method === "PATCH") {
-        // Da user_name dein Primärschlüssel in wm_bonus_tips ist, filtern wir im Query-String danach
-        url += `?user_name=eq.${encodeURIComponent(body.user_name)}`;
-    }
-
+    
     const headers = {
         "apikey": SUPABASE_KEY,
         "Authorization": `Bearer ${SUPABASE_KEY}`,
         "Content-Type": "application/json",
         "Prefer": "return=minimal"
     };
+
+    // Nutzt das native PostgreSQL-Upsert über Header, falls wir POSTen (verhindert Duplicate Key Errors)
+    if (method === "POST") {
+        headers["Prefer"] = "resolution=merge-duplicates,return=minimal";
+    }
+
+    if (method === "PATCH") {
+        url += `?user_name=eq.${encodeURIComponent(body.user_name)}&pin=eq.${encodeURIComponent(body.pin)}`;
+    }
 
     try {
         const response = await fetch(url, { method: method, headers: headers, body: JSON.stringify(body) });
@@ -343,7 +347,7 @@ async function switchTab(tabName) {
     }
 }
 
-// 👤 ANMELDUNG & REGISTRIERUNG (KORRIGIERTE STELLE)
+// 👤 ANMELDUNG & REGISTRIERUNG (KOMPLETT ÜBERARBEITET FÜR COMPOSITE PRIMARY KEY)
 async function registerUser() {
     const nameInput = document.getElementById("username").value.trim();
     const pinInput = document.getElementById("userpin").value.trim();
@@ -367,10 +371,8 @@ async function registerUser() {
 
     if(pinInput.length < 4) { alert("Bitte eine 4-stellige PIN ausdenken/eingeben!"); return; }
 
-    // Wir prüfen erst, ob der Name überhaupt in der Tabelle existiert
+    // Sicherheitsprüfung: Prüfen, ob der Name existiert, aber eine andere PIN nutzt
     const checkUrl = `${SUPABASE_URL}/rest/v1/wm_bonus_tips?user_name=eq.${encodeURIComponent(nameInput)}`;
-    let isExistingUser = false;
-
     try {
         const checkRes = await fetch(checkUrl, {
             method: "GET",
@@ -379,12 +381,11 @@ async function registerUser() {
         const checkData = await checkRes.json();
         
         if (checkData && checkData.length > 0) {
-            // Wenn der Name existiert, MUSS die PIN übereinstimmen um sich anzumelden
-            if (checkData[0].pin === pinInput) {
-                isExistingUser = true;
-            } else {
-                alert("Fehler: Dieser Benutzername existiert bereits, aber die PIN ist falsch!");
-                return; // PIN ungültig -> Abbruch!
+            // Wenn der Name existiert, MUSS die PIN übereinstimmen um sich einzuloggen
+            const match = checkData.find(d => d.pin === pinInput);
+            if (!match) {
+                alert(`Fehler: Der Name '${nameInput}' ist bereits mit einer anderen PIN geschützt!`);
+                return; 
             }
         }
     } catch(err) {
@@ -403,16 +404,12 @@ async function registerUser() {
         user_name: currentUser, pin: currentPin, wm_tip: wmTip, scorer_tip: scorerTip
     };
 
-    let success = false;
-    // Wenn der User existiert, updaten wir die Zeile (PATCH), ansonsten legen wir sie neu an (POST)
-    if (isExistingUser) {
-        success = await saveToSupabase("wm_bonus_tips", saveData, "PATCH");
-    } else {
-        success = await saveToSupabase("wm_bonus_tips", saveData, "POST");
-    }
+    // Durch den neuen resolution=merge-duplicates Header in saveToSupabase 
+    // wird aus dem POST automatisch ein sicheres Einloggen/Überschreiben (Upsert)
+    let success = await saveToSupabase("wm_bonus_tips", saveData, "POST");
 
     if(success) {
-        alert(`Erfolgreich angemeldet als '${currentUser}'! Deine PIN ist aktiv.`);
+        alert(`Erfolgreich eingeloggt als '${currentUser}'!`);
         await fetchServerData();
         updateWelcomeMessage();
         renderMatches();

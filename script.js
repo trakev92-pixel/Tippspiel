@@ -564,6 +564,7 @@ function calculatePoints(tHome, tAway, rHome, rAway) {
 }
 
 // ⚽ SPEICHERT ODER UPDATET EINEN TIPPSPIEL-EINTRAG (FÜR ALLE 104 SPIELE GEEIGNET)
+// ⚽ SPEICHERT ODER UPDATET EINEN TIPPSPIEL-EINTRAG
 async function saveTip(matchId, matchTeams, phase) {
     if (!currentUser || currentUser === "Admin⚙️") {
         alert("Bitte melde dich zuerst als Tipper an!");
@@ -578,6 +579,35 @@ async function saveTip(matchId, matchTeams, phase) {
         return;
     }
 
+    const scoreString = `${homeInput}:${awayInput}`;
+    
+    // Korrigierte Suche mit den richtigen Spaltennamen:
+    const existingTip = serverTips.find(t => t.user_name === currentUser && t.pin === currentPin && t.match_id === matchId);
+
+    const saveData = {
+        user_name: currentUser,
+        pin: currentPin,
+        match_id: matchId,
+        match_teams: matchTeams,
+        phase: phase,
+        score: scoreString,
+        home_goals: parseInt(homeInput),
+        away_goals: parseInt(awayInput)
+    };
+
+    let success = false;
+    if (existingTip && existingTip.id) {
+        success = await saveToSupabase("wm_tips", saveData, "PATCH");
+    } else {
+        success = await saveToSupabase("wm_tips", saveData, "POST");
+    }
+
+    if (success) {
+        alert("Tipp erfolgreich abgegeben!");
+        await fetchServerData();
+        renderMatches();
+    }
+}
     const scoreString = `${homeInput}:${awayInput}`;
     
     // 🔒 ÜBERARBEITET: Sucht den existierenden Tipp anhand von user UND pin, damit Kevins sich nicht löschen!

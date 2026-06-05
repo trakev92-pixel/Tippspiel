@@ -350,12 +350,14 @@ async function switchTab(tabName) {
 }
 
 // 👤 ANMELDUNG & REGISTRIERUNG (KOMPLETT ÜBERARBEITET FÜR COMPOSITE PRIMARY KEY)
+// 👤 ANMELDUNG & REGISTRIERUNG (SAUBERE TRENNUNG VON LOGIN & POST)
 async function registerUser() {
     const nameInput = document.getElementById("username").value.trim();
     const pinInput = document.getElementById("userpin").value.trim();
 
     if(nameInput === "") { alert("Bitte Namen eingeben!"); return; }
 
+    // Admin-Check
     if(nameInput.toLowerCase() === "admin") {
         const enteredPass = prompt("Admin-Passwort eingeben:");
         if (enteredPass === ADMIN_PASSWORD) {
@@ -371,6 +373,70 @@ async function registerUser() {
         return;
     }
 
+    if(pinInput.length < 4) { alert("Bitte eine 4-stellige PIN ausdenken/eingeben!"); return; }
+
+    const wmTip = document.getElementById("bonus-wm").value.trim() || "Kein Tipp";
+    const scorerTip = document.getElementById("bonus-scorer").value.trim() || "Kein Tipp";
+
+    // 1. SCHRITT: In der Datenbank prüfen, ob dieser User existiert
+    const checkUrl = `${SUPABASE_URL}/rest/v1/wm_bonus_tips?user_name=eq.${encodeURIComponent(nameInput)}`;
+    let userExists = false;
+    let correctPin = false;
+
+    try {
+        const checkRes = await fetch(checkUrl, {
+            method: "GET",
+            headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
+        });
+        const checkData = await checkRes.json();
+        
+        if (checkData && checkData.length > 0) {
+            userExists = true;
+            // Prüfen, ob die eingegebene PIN mit der in der DB übereinstimmt
+            const match = checkData.find(d => d.pin === pinInput);
+            if (match) {
+                correctPin = true;
+            }
+        }
+    } catch(err) {
+        console.error("Fehler bei Login-Prüfung", err);
+    }
+
+    // 2. SCHRITT: Logik basierend auf dem Datenbank-Ergebnis
+    if (userExists && !correctPin) {
+        alert(`Fehler: Der Name '${nameInput}' ist bereits mit einer anderen PIN geschützt!`);
+        return; 
+    }
+
+    currentUser = nameInput;
+    currentPin = pinInput;
+    localStorage.setItem("wm_user_2026", currentUser);
+    localStorage.setItem("wm_pin_2026", currentPin);
+    
+    const saveData = {
+        user_name: currentUser, pin: currentPin, wm_tip: wmTip, scorer_tip: scorerTip
+    };
+
+    let success = false;
+    if (userExists && correctPin) {
+        // User existiert und PIN ist richtig -> EINLOGGEN & UPDATEN (PATCH)
+        success = await saveToSupabase("wm_bonus_tips", saveData, "PATCH");
+    } else {
+        // User existiert noch gar nicht -> NEU ANMELDEN (POST)
+        success = await saveToSupabase("wm_bonus_tips", saveData, "POST");
+    }
+
+    if(success) {
+        if (userExists) {
+            alert(`Erfolgreich eingeloggt als '${currentUser}'!`);
+        } else {
+            alert(`Erfolgreich als neuer Tipper '${currentUser}' registriert!`);
+        }
+        await fetchServerData();
+        updateWelcomeMessage();
+        renderMatches();
+    }
+}
     if(pinInput.length < 4) { alert("Bitte eine 4-stellige PIN ausdenken/eingeben!"); return; }
 
     // Sicherheitsprüfung: Prüfen, ob der Name existiert, aber eine andere PIN nutzt

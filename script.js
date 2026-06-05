@@ -3,7 +3,7 @@ const SUPABASE_URL = "https://abzivpkrhespyvubtcer.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFieml2cGtyaGVzcHl2dWJ0Y2VyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0MjQ0MzIsImV4cCI6MjA5NjAwMDQzMn0.V2_K_GOQIgvhTmHRDl5y0EyF0AbeopYJ-u8ermrgOl8";
 
 let currentUser = localStorage.getItem("wm_user_2026") || "";
-let currentPin = localStorage.getItem("wm_pin_2026") || ""; // Merkt sich die PIN
+let currentPin = localStorage.getItem("wm_pin_2026") || ""; 
 let isAdmin = false;
 const matches = [];
 
@@ -28,22 +28,24 @@ const gruppenDaten = {
     "Gruppe L": ["England 🏴󠁧󠁢󠁥󠁮󠁧󠁿", "Kroatien 🇭🇷", "Ghana 🇬🇭", "Panama 🇵🇦"]
 };
 
-// Initialisierung der App, wenn die Webseite geladen wird
+// Initialisierung
 document.addEventListener("DOMContentLoaded", async () => {
     generate104Matches();
     buildKachelnAndTabs();
     await fetchServerData();
     updateWelcomeMessage();
-    switchTab("tippen"); // Standardmäßig das Tippen-Tab öffnen
+    switchTab("tippen"); 
 });
 
-// 🌐 DATEN AUS SUPABASE LADEN (GET)
+// 🌐 DATEN AUS SUPABASE LADEN (ERHÖHTES LIMIT!)
 async function getFromSupabase(table) {
-    const url = `${SUPABASE_URL}/rest/v1/${table}`;
+    // Limit auf 10000 Datensätze setzen, damit keine Tipps abgeschnitten werden
+    const url = `${SUPABASE_URL}/rest/v1/${table}?limit=10000`;
     const headers = {
         "apikey": SUPABASE_KEY,
         "Authorization": `Bearer ${SUPABASE_KEY}`,
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Prefer": "count=exact"
     };
     try {
         const response = await fetch(url, { method: "GET", headers: headers });
@@ -55,10 +57,9 @@ async function getFromSupabase(table) {
     }
 }
 
-// 🌐 DATEN IN SUPABASE SPEICHERN ODER AKTUALISIEREN (POST / PATCH)
+// 🌐 DATEN IN SUPABASE SPEICHERN ODER AKTUALISIEREN
 async function saveToSupabase(table, body, method = "POST") {
     let url = `${SUPABASE_URL}/rest/v1/${table}`;
-    
     const headers = {
         "apikey": SUPABASE_KEY,
         "Authorization": `Bearer ${SUPABASE_KEY}`,
@@ -87,7 +88,7 @@ async function saveToSupabase(table, body, method = "POST") {
     }
 }
 
-// 📅 GENERIERUNG ALLER 104 SPIELE
+// GENERIERUNG DER SPIELE
 function generate104Matches() {
     const gruppenMatches = [
         { phase: "Gruppe A", cat: "Gruppe A-D", date: "11.06.2026", time: "21:00", h: "Mexiko 🇲🇽", a: "Südafrika 🇿🇦" },
@@ -215,11 +216,13 @@ function generate104Matches() {
     });
 }
 
-// 📊 UPDATET LOKALE VARIABLEN AUS SERVER-DATENSÄTZEN
+// 📊 DETEKTIERT DIE NETZWERKDATEN VOM SERVER
 async function fetchServerData() {
     const tipsData = await getFromSupabase("wm_tips");
     const resultsData = await getFromSupabase("wm_results");
     const bonusData = await getFromSupabase("wm_bonus_tips");
+
+    console.log("Geladene Tipps vom Server:", tipsData.length);
 
     serverTips = tipsData.map(t => ({
         id: t.id, 
@@ -244,7 +247,7 @@ async function fetchServerData() {
     });
 }
 
-// 📑 ERSTELLT DIE STRUKTUR UND TABS
+// STRUKTUR DER REITER (TABS)
 function buildKachelnAndTabs() {
     let kachelLeiste = document.querySelector(".kachel-leiste");
     if (!kachelLeiste) return;
@@ -320,7 +323,7 @@ function buildKachelnAndTabs() {
     `;
 }
 
-// 🔄 SCHALTET ZWISCHEN TABS UM
+// REITER-WECHSEL
 async function switchTab(tabName) {
     document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
     document.querySelectorAll('.kachel').forEach(el => {
@@ -350,7 +353,7 @@ async function switchTab(tabName) {
     }
 }
 
-// 👤 ANMELDUNG & REGISTRIERUNG
+// LOG-IN UND REGISTRIERUNG
 async function registerUser() {
     const nameInput = document.getElementById("username").value.trim();
     const pinInput = document.getElementById("userpin").value.trim();
@@ -390,7 +393,7 @@ async function registerUser() {
         
         if (checkData && checkData.length > 0) {
             userExists = true;
-            const match = checkData.find(d => d.pin === pinInput);
+            const match = checkData.find(d => String(d.pin) === String(pinInput));
             if (match) {
                 correctPin = true;
             }
@@ -481,7 +484,7 @@ function logoutAdmin() {
     switchTab("tippen");
 }
 
-// 🧮 PUNKTEBERECHNUNG
+// BERECHNUNG DER TIPP-PUNKTE
 function calculatePoints(tHome, tAway, rHome, rAway) {
     const th = parseInt(tHome);
     const ta = parseInt(tAway);
@@ -504,7 +507,7 @@ function calculatePoints(tHome, tAway, rHome, rAway) {
     return 0; 
 }
 
-// ⚽ RENDERT DIE SPIEL-TIPP-KARTEN
+// RENDERT DIE SPIELKARTEN
 function renderMatches() {
     const container = document.getElementById("matches-container");
     if (!container) return;
@@ -527,8 +530,8 @@ function renderMatches() {
         let currentAwayTip = "";
 
         if (currentUser) {
-            // FIX: String-zu-Zahl-Konvertierung für robusten Datenbankvergleich
-            const found = serverTips.find(t => t.user_name === currentUser && t.pin === currentPin && parseInt(t.match_id) === parseInt(m.id));
+            // Extrem robuster ID-Vergleich
+            const found = serverTips.find(t => t.user_name === currentUser && String(t.pin) === String(currentPin) && String(t.match_id).trim() === String(m.id).trim());
             if (found && found.score && found.score.includes(":")) {
                 const parts = found.score.split(":");
                 currentHomeTip = parts[0];
@@ -577,7 +580,6 @@ function renderMatches() {
     });
 }
 
-// 📅 RENDERT WM-GRUPPEN TAB
 function renderGruppen() {
     const container = document.getElementById("gruppen-container");
     if (!container) return;
@@ -594,7 +596,7 @@ function renderGruppen() {
     }
 }
 
-// 🏆 RENDERT DIE RANGLISTE (LEADERBOARD) + ALLE USER-TIPPS
+// 🏆 RANGLISTE RENDERN
 function renderLeaderboard() {
     const container = document.getElementById("tab-tippspielrangliste");
     if (!container) return;
@@ -658,26 +660,27 @@ function renderLeaderboard() {
     `;
 }
 
-// 🔍 ZEIGT DIE LIVE-TIPPS ALLER USER FÜR EIN BESTIMMTES SPIEL AN
+// 🔍 DER CORRIGIERTE LIVE-BETRACHTER FÜR ANDERE TIERS
 function renderAllUserTips() {
     const selectEl = document.getElementById("leaderboard-match-filter");
     const displayContainer = document.getElementById("all-user-tips-container");
     if (!selectEl || !displayContainer) return;
 
-    const matchId = parseInt(selectEl.value);
+    const selectedValue = selectEl.value;
     
-    // Falls kein valides Spiel gewählt wurde, Fallback-Text anzeigen
-    if (!matchId || isNaN(matchId)) {
+    if (!selectedValue || selectedValue === "") {
         displayContainer.innerHTML = `<p style="color:#718096; margin:0;">Wähle oben ein Spiel aus, um zu sehen, was die anderen getippt haben.</p>`;
         return;
     }
 
-    const currentMatch = matches.find(m => parseInt(m.id) === matchId);
+    const matchIdStr = String(selectedValue).trim();
+    const currentMatch = matches.find(m => String(m.id).trim() === matchIdStr);
     if (!currentMatch) return;
 
-    const officialResult = serverResults[matchId];
-    // FIX: Datentypen angeglichen via parseInt, da match_id von Supabase als String zurückgeliefert werden kann
-    const matchTips = serverTips.filter(t => parseInt(t.match_id) === matchId);
+    const officialResult = serverResults[currentMatch.id];
+    
+    // RADIKALE TYPENBEREINIGUNG beim Filtern der Spalte match_id
+    const matchTips = serverTips.filter(t => String(t.match_id).trim() === matchIdStr);
 
     let htmlContent = `
         <div style="margin-bottom:12px; padding-bottom:8px; border-bottom:1px dashed #cbd5e0; font-size:0.95rem; line-height:1.5;">
@@ -722,7 +725,6 @@ function renderAllUserTips() {
     displayContainer.innerHTML = htmlContent;
 }
 
-// 📊 RENDERT OFFIZIELLE WM-ERGEBNISSE TAB
 function renderWMResultsTab() {
     const body = document.getElementById("wm-results-body");
     if (!body) return;
@@ -743,16 +745,12 @@ function renderWMResultsTab() {
     });
 }
 
-// ⚙️ ERGEBNIS SPEICHERN (NUR ALS ADMIN MÖGLICH)
 async function saveResult(matchId) {
     if (!isAdmin) return;
     const hInput = document.getElementById(`admin-home-${matchId}`).value;
     const aInput = document.getElementById(`admin-away-${matchId}`).value;
 
-    if (hInput === "" || aInput === "") {
-        alert("Bitte beide Felder ausfüllen!");
-        return;
-    }
+    if (hInput === "" || aInput === "") { alert("Bitte beide Felder ausfüllen!"); return; }
 
     const existingResult = serverResults[matchId];
     const saveData = {
@@ -787,7 +785,6 @@ async function saveResult(matchId) {
     }
 }
 
-// ⚽ SPEICHERT ODER UPDATET EINEN TIPPSPIEL-EINTRAG
 async function saveTip(matchId, matchTeams, phase) {
     if (!currentUser || currentUser === "Admin⚙️") {
         alert("Bitte melde dich zuerst als Tipper an!");
@@ -803,8 +800,7 @@ async function saveTip(matchId, matchTeams, phase) {
     }
 
     const scoreString = `${homeInput}:${awayInput}`;
-    // FIX: Auch hier robuster Schutz beim Suchen vor dem Abspeichern
-    const existingTip = serverTips.find(t => t.user_name === currentUser && t.pin === currentPin && parseInt(t.match_id) === parseInt(matchId));
+    const existingTip = serverTips.find(t => t.user_name === currentUser && String(t.pin) === String(currentPin) && String(t.match_id).trim() === String(matchId).trim());
 
     const saveData = {
         user_name: currentUser,

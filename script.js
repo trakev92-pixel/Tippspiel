@@ -66,8 +66,10 @@ async function saveToSupabase(table, body, method = "POST", rowId = null) {
         "Prefer": "return=minimal"
     };
 
-    // Nutzt das native PostgreSQL-Upsert über Header, falls wir POSTen (verhindert Duplicate Key Errors)
-    if (method === "POST") {
+    // 🌟 DAS HIER IST DER TRICK FÜR DEN LOGIN:
+    // Wenn wir ein POST senden, sagen wir Supabase, dass es bei einem Konflikt 
+    // (z.B. Name & PIN existieren schon) die Daten zusammenführen (mergen) soll.
+    if (method === "POST" && table === "wm_bonus_tips") {
         headers["Prefer"] = "resolution=merge-duplicates,return=minimal";
     }
 

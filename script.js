@@ -446,7 +446,7 @@ function updateWelcomeMessage() {
         const userBonus = serverBonusTips[`${currentUser}_${currentPin}`] || { wm: "Kein Tipp", scorer: "Kein Tipp" };
 
         welcome.innerHTML = `
-            👋 Angemeldet als: <strong style="color:#3182ce; font-size:1.2rem;">${currentUser}</strong> <small style="color:#a0aec0;">(🔒 PIN aktiv)</small><br>
+            👋 Angemelmet als: <strong style="color:#3182ce; font-size:1.2rem;">${currentUser}</strong> <small style="color:#a0aec0;">(🔒 PIN aktiv)</small><br>
             <span style="font-size:0.9rem; color:#4a5568; display:block; margin-top:5px;">
                 🔮 WM-Tipp: <strong>${userBonus.wm}</strong> | 👟 Top-Torjäger: <strong>${userBonus.scorer}</strong>
             </span>
@@ -594,7 +594,7 @@ function renderGruppen() {
     }
 }
 
-// 🏆 RENDERT DIE RANGLISTE (LEADERBOARD)
+// 🏆 RENDERT DIE RANGLISTE (LEADERBOARD) + ALLE USER-TIPPS
 function renderLeaderboard() {
     const container = document.getElementById("tab-tippspielrangliste");
     if (!container) return;
@@ -641,7 +641,79 @@ function renderLeaderboard() {
                 ${rows || '<tr><td colspan="4" style="text-align:center; padding:20px; color:#a0aec0;">Noch keine Daten vorhanden. Sobald Ergebnisse eingetragen sind, berechnet sich die Tabelle von selbst!</td></tr>'}
             </tbody>
         </table>
+
+        <div style="margin-top: 40px;">
+            <h3 style="color:#2d3748; border-bottom:2px solid #e2e8f0; padding-bottom:10px;">🔍 Tipps aller Mitspieler einsehen</h3>
+            <div style="margin: 10px 0;">
+                <label style="font-weight:bold; margin-right:10px;">Spiel auswählen:</label>
+                <select id="leaderboard-match-filter" onchange="renderAllUserTips()" style="padding:8px; border-radius:4px; border:1px solid #cbd5e0; max-width:100%;">
+                    <option value="">-- Bitte Spiel wählen --</option>
+                    ${matches.map(m => `<option value="${m.id}">Spiel ${m.id}: ${m.home} vs. ${m.away}</option>`).join("")}
+                </select>
+            </div>
+            <div id="all-user-tips-container" style="margin-top:15px; background:#f7fafc; padding:15px; border-radius:8px; border:1px solid #e2e8f0;">
+                <p style="color:#718096; margin:0;">Wähle oben ein Spiel aus, um zu sehen, was die anderen getippt haben.</p>
+            </div>
+        </div>
     `;
+
+    renderAllUserTips();
+}
+
+// 🔍 ZEIGT DIE LIVE-TIPPS ALLER USER FÜR EIN BESTIMMTES SPIEL AN
+function renderAllUserTips() {
+    const selectEl = document.getElementById("leaderboard-match-filter");
+    const displayContainer = document.getElementById("all-user-tips-container");
+    if (!selectEl || !displayContainer) return;
+
+    const matchId = parseInt(selectEl.value);
+    if (!matchId) return;
+
+    const currentMatch = matches.find(m => m.id === matchId);
+    const officialResult = serverResults[matchId];
+    const matchTips = serverTips.filter(t => t.match_id === matchId);
+
+    let htmlContent = `
+        <div style="margin-bottom:12px; padding-bottom:8px; border-bottom:1px dashed #cbd5e0; font-size:0.95rem; line-height:1.5;">
+            <strong>Begegnung:</strong> ${currentMatch.home} vs. ${currentMatch.away}<br>
+            <strong>Offizielles Ergebnis:</strong> ${officialResult ? `<span style="color:#2f855a; font-weight:bold;">${officialResult.home}:${officialResult.away}</span>` : '<span style="color:#718096;">⏳ Offen</span>'}
+        </div>
+    `;
+
+    if (matchTips.length === 0) {
+        htmlContent += `<p style="color:#a0aec0; margin:0; font-style:italic;">Für dieses Spiel wurden noch keine Tipps abgegeben.</p>`;
+    } else {
+        htmlContent += `
+            <table style="width:100%; border-collapse:collapse; background:white; border-radius:6px; overflow:hidden;">
+                <thead>
+                    <tr style="background:#edf2f7; font-size:0.9rem;">
+                        <th style="padding:8px; text-align:left;">Mitspieler</th>
+                        <th style="padding:8px; text-align:center; width:100px;">Tipp</th>
+                        <th style="padding:8px; text-align:center; width:100px;">Punkte</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        matchTips.forEach(t => {
+            let pointsEarned = "-";
+            if (officialResult) {
+                pointsEarned = calculatePoints(t.home_goals, t.away_goals, officialResult.home, officialResult.away) + " Pkt.";
+            }
+
+            htmlContent += `
+                <tr style="${t.user_name === currentUser ? 'background:#fffaf0; font-weight:bold;' : ''}">
+                    <td style="padding:8px; border-bottom:1px solid #edf2f7;">👤 ${t.user_name}</td>
+                    <td style="padding:8px; border-bottom:1px solid #edf2f7; text-align:center; font-weight:bold; color:#4a5568;">${t.score}</td>
+                    <td style="padding:8px; border-bottom:1px solid #edf2f7; text-align:center; font-weight:bold; color:#2b6cb0;">${pointsEarned}</td>
+                </tr>
+            `;
+        });
+
+        htmlContent += `</tbody></table>`;
+    }
+
+    displayContainer.innerHTML = htmlContent;
 }
 
 // 📊 RENDERT OFFIZIELLE WM-ERGEBNISSE TAB

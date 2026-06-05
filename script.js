@@ -56,7 +56,7 @@ async function getFromSupabase(table) {
 }
 
 // 🌐 DATEN IN SUPABASE SPEICHERN ODER AKTUALISIEREN (POST / PATCH)
-async function saveToSupabase(table, body, method = "POST", rowId = null) {
+async function saveToSupabase(table, body, method = "POST") {
     let url = `${SUPABASE_URL}/rest/v1/${table}`;
     
     const headers = {
@@ -68,7 +68,8 @@ async function saveToSupabase(table, body, method = "POST", rowId = null) {
 
     if (method === "PATCH") {
         url += `?user_name=eq.${encodeURIComponent(body.user_name)}&pin=eq.${encodeURIComponent(body.pin)}`;
-        if (body.match_id) {
+        // Fix: Prüfen, ob wir ein konkretes Match updaten wollen
+        if (body.match_id !== undefined && body.match_id !== null) {
             url += `&match_id=eq.${body.match_id}`;
         }
     }
@@ -111,7 +112,7 @@ function generate104Matches() {
         { phase: "Gruppe J", cat: "Gruppe I-L", date: "17.06.2026", time: "03:00", h: "Argentinien 🇦🇷", a: "Algerien 🇩🇿" },
         { phase: "Gruppe J", cat: "Gruppe I-L", date: "17.06.2026", time: "06:00", h: "Österreich 🇦🇹", a: "Jordanien 🇯🇴" },
         { phase: "Gruppe K", cat: "Gruppe I-L", date: "17.06.2026", time: "19:00", h: "Portugal 🇵🇹", a: "DR Kongo 🇨🇩" },
-        { phase: "Gruppe L", cat: "Gruppe I-L", date: "17.06.2026", time: "22:00", h: "England 🏴󠁧󠁢󠁥󠁮態", a: "Kroatien 🇭🇷" },
+        { phase: "Gruppe L", cat: "Gruppe I-L", date: "17.06.2026", time: "22:00", h: "England 🏴󠁧󠁢󠁥󠁮󠁧󠁿", a: "Kroatien 🇭🇷" },
         { phase: "Gruppe L", cat: "Gruppe I-L", date: "18.06.2026", time: "01:00", h: "Ghana 🇬🇭", a: "Panama 🇵🇦" },
         { phase: "Gruppe K", cat: "Gruppe I-L", date: "18.06.2026", time: "04:00", h: "Usbekistan 🇺🇿", a: "Kolumbien 🇨🇴" },
         { phase: "Gruppe A", cat: "Gruppe A-D", date: "18.06.2026", time: "18:00", h: "Tschechien 🇨🇿", a: "Südafrika 🇿🇦" },
@@ -598,7 +599,6 @@ function renderLeaderboard() {
     const container = document.getElementById("tab-tippspielrangliste");
     if (!container) return;
 
-    // Berechnung aller Punkte gruppiert nach User & PIN
     const userScores = {};
 
     serverTips.forEach(t => {

@@ -68,7 +68,6 @@ async function saveToSupabase(table, body, method = "POST") {
 
     if (method === "PATCH") {
         url += `?user_name=eq.${encodeURIComponent(body.user_name)}&pin=eq.${encodeURIComponent(body.pin)}`;
-        // FIX: Korrekte Filterung bei Tabellen-Updates für Match-Tipps
         if (table === "wm_tips" && body.match_id !== undefined) {
             url += `&match_id=eq.${body.match_id}`;
         }
@@ -528,8 +527,9 @@ function renderMatches() {
         let currentAwayTip = "";
 
         if (currentUser) {
-            const found = serverTips.find(t => t.user_name === currentUser && t.pin === currentPin && t.match_id === m.id);
-            if (found && found.score) {
+            // FIX: String-zu-Zahl-Konvertierung für robusten Datenbankvergleich
+            const found = serverTips.find(t => t.user_name === currentUser && t.pin === currentPin && parseInt(t.match_id) === parseInt(m.id));
+            if (found && found.score && found.score.includes(":")) {
                 const parts = found.score.split(":");
                 currentHomeTip = parts[0];
                 currentAwayTip = parts[1];
@@ -656,9 +656,6 @@ function renderLeaderboard() {
             </div>
         </div>
     `;
-
-    // FIX: Wir rufen die Detail-Funktion hier nicht mehr blind auf, da der Default-Filter "" (leer) ist.
-    // Das verhindert unnötige Fehlermeldungen beim ersten Laden des Tabs.
 }
 
 // 🔍 ZEIGT DIE LIVE-TIPPS ALLER USER FÜR EIN BESTIMMTES SPIEL AN
@@ -675,11 +672,12 @@ function renderAllUserTips() {
         return;
     }
 
-    const currentMatch = matches.find(m => m.id === matchId);
+    const currentMatch = matches.find(m => parseInt(m.id) === matchId);
     if (!currentMatch) return;
 
     const officialResult = serverResults[matchId];
-    const matchTips = serverTips.filter(t => t.match_id === matchId);
+    // FIX: Datentypen angeglichen via parseInt, da match_id von Supabase als String zurückgeliefert werden kann
+    const matchTips = serverTips.filter(t => parseInt(t.match_id) === matchId);
 
     let htmlContent = `
         <div style="margin-bottom:12px; padding-bottom:8px; border-bottom:1px dashed #cbd5e0; font-size:0.95rem; line-height:1.5;">
@@ -805,7 +803,8 @@ async function saveTip(matchId, matchTeams, phase) {
     }
 
     const scoreString = `${homeInput}:${awayInput}`;
-    const existingTip = serverTips.find(t => t.user_name === currentUser && t.pin === currentPin && t.match_id === matchId);
+    // FIX: Auch hier robuster Schutz beim Suchen vor dem Abspeichern
+    const existingTip = serverTips.find(t => t.user_name === currentUser && t.pin === currentPin && parseInt(t.match_id) === parseInt(matchId));
 
     const saveData = {
         user_name: currentUser,

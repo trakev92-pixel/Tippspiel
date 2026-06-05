@@ -66,15 +66,12 @@ async function saveToSupabase(table, body, method = "POST", rowId = null) {
         "Prefer": "return=minimal"
     };
 
-    // 🌟 DAS HIER IST DER TRICK FÜR DEN LOGIN:
-    // Wenn wir ein POST senden, sagen wir Supabase, dass es bei einem Konflikt 
-    // (z.B. Name & PIN existieren schon) die Daten zusammenführen (mergen) soll.
-    if (method === "POST" && table === "wm_bonus_tips") {
-        headers["Prefer"] = "resolution=merge-duplicates,return=minimal";
-    }
-
     if (method === "PATCH") {
         url += `?user_name=eq.${encodeURIComponent(body.user_name)}&pin=eq.${encodeURIComponent(body.pin)}`;
+        // Falls ein spezifisches Spiel geupdatet wird, hängen wir die match_id an
+        if (body.match_id) {
+            url += `&match_id=eq.${body.match_id}`;
+        }
     }
 
     try {
@@ -220,13 +217,11 @@ function generate104Matches() {
 }
 
 // 📊 UPDATET LOKALE VARIABLEN AUS SERVER-DATENSÄTZEN
-// 📊 UPDATET LOKALE VARIABLEN AUS SERVER-DATENSÄTZEN
 async function fetchServerData() {
     const tipsData = await getFromSupabase("wm_tips");
     const resultsData = await getFromSupabase("wm_results");
     const bonusData = await getFromSupabase("wm_bonus_tips");
 
-    // Hier behalten wir die exakten Namen bei, die auch in der Datenbank stehen!
     serverTips = tipsData.map(t => ({
         id: t.id, 
         user_name: t.user_name, 
@@ -356,15 +351,13 @@ async function switchTab(tabName) {
     }
 }
 
-// 👤 ANMELDUNG & REGISTRIERUNG (KOMPLETT ÜBERARBEITET FÜR COMPOSITE PRIMARY KEY)
-// 👤 ANMELDUNG & REGISTRIERUNG (SAUBERE TRENNUNG VON LOGIN & POST)
+// 👤 ANMELDUNG & REGISTRIERUNG
 async function registerUser() {
     const nameInput = document.getElementById("username").value.trim();
     const pinInput = document.getElementById("userpin").value.trim();
 
     if(nameInput === "") { alert("Bitte Namen eingeben!"); return; }
 
-    // Admin-Check
     if(nameInput.toLowerCase() === "admin") {
         const enteredPass = prompt("Admin-Passwort eingeben:");
         if (enteredPass === ADMIN_PASSWORD) {
@@ -399,7 +392,6 @@ async function registerUser() {
         
         if (checkData && checkData.length > 0) {
             userExists = true;
-            // Prüfen, ob die eingegebene PIN mit der in der DB übereinstimmt
             const match = checkData.find(d => d.pin === pinInput);
             if (match) {
                 correctPin = true;
@@ -426,10 +418,8 @@ async function registerUser() {
 
     let success = false;
     if (userExists && correctPin) {
-        // User existiert und PIN ist richtig -> EINLOGGEN & UPDATEN (PATCH)
         success = await saveToSupabase("wm_bonus_tips", saveData, "PATCH");
     } else {
-        // User existiert noch gar nicht -> NEU ANMELDEN (POST)
         success = await saveToSupabase("wm_bonus_tips", saveData, "POST");
     }
 
@@ -439,52 +429,6 @@ async function registerUser() {
         } else {
             alert(`Erfolgreich als neuer Tipper '${currentUser}' registriert!`);
         }
-        await fetchServerData();
-        updateWelcomeMessage();
-        renderMatches();
-    }
-}
-    if(pinInput.length < 4) { alert("Bitte eine 4-stellige PIN ausdenken/eingeben!"); return; }
-
-    // Sicherheitsprüfung: Prüfen, ob der Name existiert, aber eine andere PIN nutzt
-    const checkUrl = `${SUPABASE_URL}/rest/v1/wm_bonus_tips?user_name=eq.${encodeURIComponent(nameInput)}`;
-    try {
-        const checkRes = await fetch(checkUrl, {
-            method: "GET",
-            headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
-        });
-        const checkData = await checkRes.json();
-        
-        if (checkData && checkData.length > 0) {
-            // Wenn der Name existiert, MUSS die PIN übereinstimmen um sich einzuloggen
-            const match = checkData.find(d => d.pin === pinInput);
-            if (!match) {
-                alert(`Fehler: Der Name '${nameInput}' ist bereits mit einer anderen PIN geschützt!`);
-                return; 
-            }
-        }
-    } catch(err) {
-        console.error("Fehler bei Login-Prüfung", err);
-    }
-
-    const wmTip = document.getElementById("bonus-wm").value.trim() || "Kein Tipp";
-    const scorerTip = document.getElementById("bonus-scorer").value.trim() || "Kein Tipp";
-
-    currentUser = nameInput;
-    currentPin = pinInput;
-    localStorage.setItem("wm_user_2026", currentUser);
-    localStorage.setItem("wm_pin_2026", currentPin);
-    
-    const saveData = {
-        user_name: currentUser, pin: currentPin, wm_tip: wmTip, scorer_tip: scorerTip
-    };
-
-    // Durch den neuen resolution=merge-duplicates Header in saveToSupabase 
-    // wird aus dem POST automatisch ein sicheres Einloggen/Überschreiben (Upsert)
-    let success = await saveToSupabase("wm_bonus_tips", saveData, "POST");
-
-    if(success) {
-        alert(`Erfolgreich eingeloggt als '${currentUser}'!`);
         await fetchServerData();
         updateWelcomeMessage();
         renderMatches();
@@ -540,7 +484,7 @@ function logoutAdmin() {
     switchTab("tippen");
 }
 
-// 🧮 PUNKTEBERECHNUNG: Exakt = 4, Tendenz = 2, Falsche Tendenz aber ein richtiges Tor = 1, Sonst = 0
+// 🧮 PUNKTEBERECHNUNG
 function calculatePoints(tHome, tAway, rHome, rAway) {
     const th = parseInt(tHome);
     const ta = parseInt(tAway);
@@ -563,7 +507,6 @@ function calculatePoints(tHome, tAway, rHome, rAway) {
     return 0; 
 }
 
-// ⚽ SPEICHERT ODER UPDATET EINEN TIPPSPIEL-EINTRAG (FÜR ALLE 104 SPIELE GEEIGNET)
 // ⚽ SPEICHERT ODER UPDATET EINEN TIPPSPIEL-EINTRAG
 async function saveTip(matchId, matchTeams, phase) {
     if (!currentUser || currentUser === "Admin⚙️") {
@@ -581,7 +524,7 @@ async function saveTip(matchId, matchTeams, phase) {
 
     const scoreString = `${homeInput}:${awayInput}`;
     
-    // Korrigierte Suche mit den richtigen Spaltennamen:
+    // Sucht den existierenden Tipp anhand von user_name, pin UND match_id
     const existingTip = serverTips.find(t => t.user_name === currentUser && t.pin === currentPin && t.match_id === matchId);
 
     const saveData = {
@@ -596,37 +539,8 @@ async function saveTip(matchId, matchTeams, phase) {
     };
 
     let success = false;
-    if (existingTip && existingTip.id) {
+    if (existingTip) {
         success = await saveToSupabase("wm_tips", saveData, "PATCH");
-    } else {
-        success = await saveToSupabase("wm_tips", saveData, "POST");
-    }
-
-    if (success) {
-        alert("Tipp erfolgreich abgegeben!");
-        await fetchServerData();
-        renderMatches();
-    }
-}
-    const scoreString = `${homeInput}:${awayInput}`;
-    
-    // 🔒 ÜBERARBEITET: Sucht den existierenden Tipp anhand von user UND pin, damit Kevins sich nicht löschen!
-    const existingTip = serverTips.find(t => t.user === currentUser && t.pin === currentPin && t.matchId === matchId);
-
-    const saveData = {
-        user_name: currentUser,
-        pin: currentPin,
-        match_id: matchId,
-        match_teams: matchTeams,
-        phase: phase,
-        score: scoreString,
-        home_goals: parseInt(homeInput),
-        away_goals: parseInt(awayInput)
-    };
-
-    let success = false;
-    if (existingTip && existingTip.id) {
-        success = await saveToSupabase("wm_tips", saveData, "PATCH", existingTip.id);
     } else {
         success = await saveToSupabase("wm_tips", saveData, "POST");
     }

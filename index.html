@@ -3,26 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WM 2026 Tippspiel</title>
-    <link rel="stylesheet" href="style.css">
+    <title>WM 2026 - Tippspiel Backend-Zentrale</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f7fafc; color: #2d3748; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        h1 { color: #2b6cb0; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-top: 0; }
+        h2 { color: #4a5568; margin-top: 30px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, min-width(200px), 1fr); gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: #ebf8ff; padding: 15px; border-radius: 8px; border-left: 4px solid #3182ce; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 10px; border-bottom: 1px solid #edf2f7; text-align: left; }
+        th { background: #edf2f7; }
+        .btn { background: #e53e3e; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; }
+        .btn:hover { background: #c53030; }
+        .btn-refresh { background: #3182ce; margin-bottom: 15px; font-size: 1rem; padding: 10px 20px; }
+        .btn-refresh:hover { background: #2b6cb0; }
+        .danger-zone { background: #fff5f5; border: 1px solid #fed7d7; padding: 15px; border-radius: 8px; margin-top: 40px; }
+    </style>
 </head>
 <body>
 
-    <header style="text-align: center; padding: 20px; background: #1a365d; color: white; margin-bottom: 20px; border-radius: 0 0 12px 12px;">
-        <h1 style="margin: 0; font-size: 2rem;">🏆 WM 2026 TIPPSPIEL 🏆</h1>
-        <p style="margin: 5px 0 15px 0; opacity: 0.9;">Tippe die Spiele und hole dir den Thron!</p>
+<div class="container">
+    <h1>⚙️ WM 2026 Tippspiel - Live Backend-Datenansicht</h1>
+    <p>Dieses Mini-Backend liest die Rohdaten direkt aus deiner Supabase-Cloud. Du benötigst keine Server-Software.</p>
+    
+    <button class="btn btn-refresh" onclick="loadBackendData()">🔄 Daten live vom Server aktualisieren</button>
+
+    <div class="stats-grid">
+        <div class="stat-card">Gespeicherte Tipps gesamt: <span id="stat-tips">0</span></div>
+        <div class="stat-card">Eingetragene Ergebnisse: <span id="stat-results">0</span></div>
+        <div class="stat-card">Registrierte Spieler (Bonus): <span id="stat-users">0</span></div>
+    </div>
+
+    <h2>📋 Rohdaten: Alle abgegebenen Tipps der User (`wm_tips`)</h2>
+    <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID (DB)</th>
+                    <th>Mitspieler</th>
+                    <th>PIN</th>
+                    <th>Spiel-ID</th>
+                    <th>Begegnung</th>
+                    <th>Tipp</th>
+                    <th>Aktion</th>
+                </tr>
+            </thead>
+            <tbody id="table-tips-body">
+                <tr><td colspan="7" style="text-align:center; color:#a0aec0;">Klicke auf Aktualisieren, um Daten zu laden...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="danger-zone">
+        <h3 style="color:#c53030; margin-top:0;">⚠️ Daten-Bereinigung (Gefahrenzone)</h3>
+        <p style="font-size:0.9rem; color:#742a2a;">Hier kannst du fehlerhafte Einträge direkt aus der Supabase-Datenbank löschen, falls sich jemand vertippt hat oder ein Systemfehler vorliegt.</p>
+    </div>
+</div>
+
+<script>
+    // ⚠️ HIER DEINE DATEN VON SUPABASE EINTRAGEN!
+    const SUPABASE_URL = "https://abzivpkrhespyvubtcer.supabase.co"; 
+    const SUPABASE_KEY = "HIER_DEINEN_ANON_PUBLIC_KEY_EINFUEGEN";
+
+    // Automatisch beim Start laden
+    window.onload = loadBackendData;
+
+    async function loadBackendData() {
+        console.log("Backend-Fetch gestartet...");
         
-        <button onclick="window.print()" class="download-poster-btn">
-            🖨️ Poster als PDF herunterladen / drucken
-        </button>
-    </header>
+        // 1. Alle Tabellen abfragen (mit extrem hohem Limit, um Kürzungen zu vermeiden)
+        const tips = await fetchFromSupabase("wm_tips?limit=10000");
+        const results = await fetchFromSupabase("wm_results?limit=500");
+        const bonus = await fetchFromSupabase("wm_bonus_tips?limit=500");
 
-    <main style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
-        <div class="kachel-leiste" style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;"></div>
+        // 2. Statistiken füllen
+        document.getElementById("stat-tips").innerText = tips.length;
+        document.getElementById("stat-results").innerText = results.length;
+        document.getElementById("stat-users").innerText = bonus.length;
 
-        <div id="tab-content-area"></div>
-    </main>
+        // 3. Tabelle der Tipps aufbauen
+        const tbody = document.getElementById("table-tips-body");
+        tbody.innerHTML = "";
 
-    <script src="script.js"></script>
+        if(tips.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#a0aec0;">Keine Tipps in der Datenbank gefunden.</td></tr>`;
+            return;
+        }
+
+        // Sortiert nach Spiel-ID, damit es übersichtlich ist
+        tips.sort((a,b) => parseInt(a.match_id) - parseInt(b.match_id));
+
+        tips.forEach(t => {
+            tbody.innerHTML += `
+                <tr id="row-tip-${t.id}">
+                    <td><code>${t.id}</code></td>
+                    <td><strong>${t.user_name}</strong></td>
+                    <td style="color:#718096; font-size:0.85rem;">${t.pin}</td>
+                    <td style="text-align:center; font-weight:bold;">${t.match_id}</td>
+                    <td><small>${t.match_teams || 'Unbekannt'}</small></td>
+                    <td style="color:#2b6cb0; font-weight:bold; font-size:1.1rem;">${t.score}</td>
+                    <td>
+                        <button class="btn" onclick="deleteRow('wm_tips', ${t.id})">🗑️ Löschen</button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    // Hilfsfunktion: GET
+    async function fetchFromSupabase(endpoint) {
+        const url = `${SUPABASE_URL}/rest/v1/${endpoint}`;
+        const headers = {
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${SUPABASE_KEY}`,
+            "Content-Type": "application/json"
+        };
+        try {
+            const res = await fetch(url, { method: "GET", headers: headers });
+            if (!res.ok) throw new Error("Fehler beim Laden");
+            return await res.json();
+        } catch (e) {
+            console.error(e);
+            return [];
+        }
+    }
+
+    // Hilfsfunktion: EINTRAG LÖSCHEN (Backend-Funktion)
+    async function deleteRow(table, id) {
+        if(!confirm(`Möchtest du den Eintrag mit der ID ${id} wirklich unwiderruflich aus '${table}' löschen?`)) {
+            return;
+        }
+
+        const url = `${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`;
+        const headers = {
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${SUPABASE_KEY}`,
+            "Prefer": "return=minimal"
+        };
+
+        try {
+            const response = await fetch(url, { method: "DELETE", headers: headers });
+            if(response.ok) {
+                alert("Eintrag erfolgreich gelöscht!");
+                // Zeile sofort visuell entfernen
+                const row = document.getElementById(`row-tip-${id}`);
+                if(row) row.remove();
+                // Stats neu berechnen
+                loadBackendData();
+            } else {
+                const errText = await response.text();
+                alert("Fehler beim Löschen: " + errText);
+            }
+        } catch(e) {
+            console.error(e);
+            alert("Netzwerkfehler beim Löschen.");
+        }
+    }
+</script>
+
 </body>
 </html>
